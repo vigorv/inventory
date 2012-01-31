@@ -1,0 +1,8 @@
+<?
+include_once "config.inc.php";
+include_once PATH_API."/payment_out.class.php";
+
+$wm= new payment_out();
+$wm->action();
+debug_echo();
+?>

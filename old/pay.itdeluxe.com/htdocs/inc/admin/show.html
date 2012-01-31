@@ -1,0 +1,70 @@
+<?
+$pager=$this->get_param("pager"); 
+$razd=$this->get_razd();
+$rows=$this->get_admin_show_rows();
+?>
+<?=$this->get_parent_link();?>
+<?if($this->notify!=""){echo "<br><font color=\"green\">$this->notify</font><br>";}?>
+
+<?=$pager?>
+<table cellpadding=2 cellspacing=1>
+<tr align=center valign=top bgcolor="<? echo $SETTINGS["COLORS"]["TblHead"];?>">
+<?
+ //подготовка ссылки на сортировку  
+ if(isset($this->PARAMS["direct"])&&$this->PARAMS["direct"]==1){$imgs=get_img("DirectUp"); $direct=0;} else {$imgs=get_img("DirectDown"); $direct=1;}
+ $imgs="<a href=\"".$this->PARAMS["out_url"].$razd."d=$direct\">$imgs</a>";?>
+<td>№</td>
+	<? $i=0;foreach($rows as $key=>$attr){
+
+		?>
+ 	<?$img="";if($this->PARAMS["sort"]==$i)$img=$imgs;?>
+	<td><?echo $img;?><a href="<?echo $this->PARAMS["out_url"].$razd;?>s=<?=$i?>"><?=$attr["string"]?></a></td>
+	
+ <?$i++;}?>
+<td align=right>
+<a href="<?echo $this->PARAMS["out_url"].$razd;?>act=edit"><?echo get_img("Add");?></a>
+</td></tr>
+<?
+  $ar=$this->PARAMS[$this->SETTINGS["table_prefix"]."show"];
+  ///$ar=array();
+  for($i=0;$i<count($ar);$i++){
+   $cur=$ar[$i];
+   $color=($i%2==0)?$SETTINGS["COLORS"]["Frm1"]:$SETTINGS["COLORS"]["Frm2"];
+  ?>
+  <tr valign=top bgcolor="<?echo $color;?>">
+  <td><?=$i+1?></td>
+  <?
+  foreach($rows as $key=>$attrs){
+  	//echo $attrs[$key]."..".$attrs_name[$key];
+  	switch ($attrs["show"]["type"])
+  	{
+  		case "":$name=$cur[$key];break;
+  		case "%id%":$name=$cur[$key];break;
+  		case "%act%":
+  		  				$name="<a href=\"".$this->PARAMS["out_url"].$razd."act=".$key."&id=".$this->PARAMS["id"]."&active=".$cur[$key]."\">".get_img($cur[$key])."</a></td>";
+						 		break;
+			default: $name=$this->PARAMS["1forN"][$attrs["show"]["type"]][$cur[$key]]['name'];break;
+  	
+  	}
+  	?><td><?echo $name;?></td>
+	<?}?>
+  <td nowrap>
+<?
+foreach ($this->PARAMS["showparams"]['childs'] as $k=>$v)
+{
+    $pict=(isset($v['icon'][0]))?$v['icon'][0]:'' ;
+    $alt=(isset($v['icon'][1]))?$v['icon'][1]:'' ;
+    $link=(isset($v['link']))?$v['link']:'';
+    $link=str_replace('%id%',$cur["id"],$link);
+    $link=str_replace('%',$this->PARAMS["out_url"],$link);
+    echo "<a href=\"".$link."\">".get_img($pict,$alt)."</a>\n";
+
+}
+echo"
+<a href=\"".$this->PARAMS["out_url"].$razd."act=show&id=".$cur["id"]."\">".get_img("Show")."</a>
+<a href=\"".$this->PARAMS["out_url"].$razd."act=edit&id=".$cur["id"]."\">".get_img("Edit")."</a>
+<a href=\"".$this->PARAMS["out_url"].$razd."act=del&id=".$cur["id"]."\" onclick=\"return confirm('Удалить?')\">".get_img("Del")."</a>
+  </td></tr>";?>
+  <?}?>
+</table>
+<?=$pager?>

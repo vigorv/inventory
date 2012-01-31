@@ -1,0 +1,180 @@
+#!/usr/bin/perl
+
+#
+# FreeGet Daemon entry
+# (c) IT Deluxe, 2007
+# (c) Dmitry Root, 2007
+#
+
+use POSIX ":sys_wait_h";
+use DBI;
+
+# 1. Locate the configfile and read it
+
+my($cf_path) = @ARGV;
+my @search = ( '/etc/freegetd.conf', '/usr/local/etc/freegetd.conf', '/usr/local/freeget/etc/freegetd.conf', "$ENV{HOME}/.freegetd" );
+@search = ($cf_path, @search) if $cf_path;
+
+my $cf = '';
+foreach my $i(@search) {
+    if(-r $i) {
+        $cf = $i;
+        break;
+    }
+}
+if($cf eq '') {
+    print STDERR "USAGE: freegetd [config_filename]\n";
+    exit 1;
+}
+
+my $config = ReadConfig($cf);
+
+
+# 2. Locate the modules folder
+
+@search = ( '/usr/share/freeget', '/usr/local/share/freeget', '/usr/local/freeget/share/freeget' );
+@search = ($config->{path}->{modules}, @search) if $config->{path}->{modules};
+
+my $mod_dir;
+foreach my $i(@search) {
+    if(-r "$i/FreeGet/Downloader.pm") {
+        $mod_dir = $config->{path}->{modules} = $i;
+        break;
+    }
+}
+unless($mod_dir) {
+    print STDERR "freegetd: could not find modules directory\n";
+    exit 2;
+}
+
+
+# 3. Execute the daemons and look for them
+
+my $dbh = DBI->connect("DBI:mysql:database=$config->{mysql}->{name};host=$config->{mysql}->{host}", $config->{mysql}->{user}, $config->{mysql}->{pass});
+die "Could not connect to DB: ${DBI::errstr}" unless $dbh;
+
+my @daemons = split(/[\s\t]+/, $config->{global}->{daemons});
+unless(@daemons) {
+    print STDERR "freegetd: no daemons configuration found in the configfile\n";
+    exit 3;
+}
+my $sleep = $config->{global}->{sleep}+0 || 1;
+require "$mod_dir/FreeGet/Downloader.pm";
+
+$CHILDREN = {};
+@KILLED = ();
+$TERM = 0;
+$HUP = 0;
+
+$SIG{CHLD} = \&SIG_CHLD;
+$SIG{TERM} = \&SIG_TERM;
+$SIG{INT} = sub {};
+$SIG{ABRT} = sub {};
+$SIG{PIPE} = sub {};
+
+SpawnAll($config, \@daemons);
+
+while(1) {
+    if($TERM) {
+        $TERM = 0;
+        StopAll(9);
+        break;
+    } elsif($HUP) {
+        $CHILDREN = {};
+        $config = ReadConfig($cf);
+        @daemons = split(/[\s\t]+/, $config->{global}->{daemons});
+        $sleep = $config->{global}->{sleep}+0 || 1;
+        SpawnAll($config, \@daemons);
+    } elsif(@KILLED) {
+        foreach my $i(@KILLED) {
+            SpawnChild($i, $config);
+        }
+        @KILLED = ();
+    } else {
+        while(1) {
+            my($id, $abort_url, $status, $abort_pid) = $dbh->selectrow_array($config->{global}->{abort_query});
+            last unless($id && $abort_url);
+            $id += 0; $abort_url += 0; $abort_pid += 0; $status += 0;
+            $dbh->do("delete from `abort` where `id`=$id;") || die "SQL error: ${DBI::errstr}";
+            if($abort_pid && $CHILDREN->{$abort_pid} && ($status == 1 || $status == 3)) {
+                kill(6, $abort_pid);
+            }
+            $dbh->do("update `urls` set `status`=13 where `id`=$abort_url;") || die "SQL error: ${DBI::errstr}";
+        }
+    }
+    sleep($sleep);
+}
+
+
+sub ReadConfig {
+    my($fn) = @_;
+    my $fd;
+    open($fd, $fn) || die "Could not open '$fn': $!";
+    my $res = {};
+    my $sect = '';
+    while(my $line = <$fd>) {
+        chomp($line);
+        $line =~ s/\#.*$//;
+        $line =~ s/^[\s\t]+|[\s\t]+$//g;
+        next if $line eq '';
+        if($line =~ /^\[[\s\t]*(.*?)[\s\t]*\]$/) {
+            $sect = $1;
+        } else {
+            my($name,$val) = split(/[\s\t]*\=[\s\t]*/, $line, 2);
+            $res->{$sect}->{$name} = $val;
+        }
+    }
+    close($fd);
+    return $res;
+}
+
+sub SpawnChild {
+    my($name, $config) = @_;
+    my $pid = fork();
+    die $! unless defined($pid);
+    if($pid) {
+        # Root process
+        $CHILDREN->{$pid} = $name;
+    } else {
+        # Child process
+        $0 = "freegetd: $name";
+        my $downloader = FreeGet::Downloader->new($name, $config);
+        $downloader->Start();
+    }
+}
+
+sub SpawnAll {
+    my($config, $daemons) = @_;
+    foreach my $i(@{$daemons}) {
+        SpawnChild($i, $config);
+    }
+}
+
+sub StopAll {
+    my($sig) = @_;
+    my @pids = keys %{$CHILDREN};
+    $CHILDREN = {};
+    foreach my $i(@pids) {
+        kill($sig, $pid);
+        waitpid($pid, 0);
+    }
+}
+
+sub SIG_CHLD {
+    my $child;
+    while(($child = waitpid(-1, WNOHANG)) > 0) {
+        if($CHILDREN->{$child}) {
+            push(@KILLED, $CHILDREN->{$child});
+            undef($CHILDREN->{$child});
+        }
+    }
+    $SIG{CHLD} = \&SIG_CHLD;
+}
+
+sub SIG_TERM {
+    $TERM = 1;
+}
+
+sub SIG_HUP {
+    $HUP = 1;
+}

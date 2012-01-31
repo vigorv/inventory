@@ -1,0 +1,24 @@
+<?
+if($ip->is_localip())
+{
+?>
+<form method="POST" action=""<?echo $_SERVER["PHP_SELF"];?>"">
+Действительно хотите заплатить через Биллинг?
+        <input type="hidden" name="order_id" value="<?=$id?>">
+    <input type="hidden"name="pay" value="<?=$pay?>">
+    <input type="hidden" name="article" value="<?=$article?>">
+    <input type="hidden" name="act" value="paybil">
+    <input type="hidden" name="paysystem" value="bil">
+    <input type="hidden" name="ip" value="<?=$ip->get_ip();?>">
+
+    <input type="submit" value="заплатить <?=$pay?>...">
+</form>
+<?
+//$this->bil();
+}
+else echo "Вы не можете совершить платёж через Биллинг так как вашего IP нет в списке наших сетей
+          <br><a href='#' onclick='javascript:history.back();'><<вернуться</a>
+          ";
+
+//debug_echo();
+?>

@@ -1,0 +1,18 @@
+<?
+$attrs["success_url"]=str_replace("%id%",$id,$attrs["success_url"]);
+$attrs["fail_url"]=str_replace("%id%",$id,$attrs["fail_url"]);
+
+?>
+<form action="https://rupay.com/pay.php" name="pay" method="POST">
+<p>Вы хотите совершить платеж через платежную систему RUpay 
+<input type="hidden" name="in_email" value="<?=$attrs["taker_email"]?>">
+<input type="hidden" name="pay_id" value="<?=$id?>">
+<input type="hidden" name="send_sum" value="<?=$pay?>">
+<input type="hidden" name="name_service" value="<?=$article?>">
+<input type="hidden" name="order_id" value="<?=$id?>">
+<input type="hidden" name="success_url" value="<?=$attrs["success_url"]?>">
+<input type="hidden" name="fail_url" value="<?=$attrs["fail_url"]?>">
+<input type="submit" name="button" value="заплатить <?=$pay?> $  ...">
+</p>
+<p>Если Вы не имеете счет в платежной системе RUpay, открыть Вы можете <a href="https://rupay.com/register.php" target="_blank">здесь</a></p>
+</form>

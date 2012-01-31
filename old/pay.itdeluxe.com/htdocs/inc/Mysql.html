@@ -1,0 +1,62 @@
+<table cellpadding=2 cellspacing=1>
+<form method=post action="<?echo $_SERVER["PHP_SELF"];?>">
+<?$i=0;$color=($i%2==0)?$SETTINGS["COLORS"]["Frm1"]:$SETTINGS["COLORS"]["Frm2"];$i++;?>
+<tr bgcolor="<?echo $color;?>">
+ <td colspan=2 align=center>
+ <b>Форма</b>
+ </td>
+</tr>
+<?$color=($i%2==0)?$SETTINGS["COLORS"]["Frm1"]:$SETTINGS["COLORS"]["Frm2"];$i++;?>
+<tr bgcolor="<?echo $color;?>">
+ <td align=right valign=top>
+ Имя сервера
+ </td><td>
+ <input type="text" name="host" value="<?echo $host;?>">
+ </td>
+</tr>
+<?$color=($i%2==0)?$SETTINGS["COLORS"]["Frm1"]:$SETTINGS["COLORS"]["Frm2"];$i++;?>
+<tr bgcolor="<?echo $color;?>">
+ <td align=right valign=top>
+ Имя пользователя
+ </td><td>
+ <input type="text" name="login" value="<?echo $login;?>">
+ </td>
+</tr>
+<?$color=($i%2==0)?$SETTINGS["COLORS"]["Frm1"]:$SETTINGS["COLORS"]["Frm2"];$i++;?>
+<tr bgcolor="<?echo $color;?>">
+ <td align=right valign=top>
+ Пароль
+ </td><td>
+ <input type="text" name="pass" value="<?echo $pass;?>">
+ </td>
+</tr>
+<?$color=($i%2==0)?$SETTINGS["COLORS"]["Frm1"]:$SETTINGS["COLORS"]["Frm2"];$i++;?>
+<tr bgcolor="<?echo $color;?>">
+ <td align=right valign=top>
+ База
+ </td><td>
+ <input type="text" name="db" value="<?echo $db;?>">
+ </td>
+</tr>
+
+<?$color=($i%2==0)?$SETTINGS["COLORS"]["Frm1"]:$SETTINGS["COLORS"]["Frm2"];$i++;?>
+<tr bgcolor="<?echo $color;?>">
+ <td align=right valign=top>
+ Запрос
+ </td><td>
+ <textarea name="sql" cols=60 rows=10><?echo $sql;?></textarea>
+ </td>
+</tr>
+
+ <?$color=($i%2==0)?$SETTINGS["COLORS"]["Frm1"]:$SETTINGS["COLORS"]["Frm2"];$i++;?>
+<tr bgcolor="<?echo $color;?>">
+ <td colspan=2 align=center>
+ <input type=hidden name="act" value="go">
+ <input type=submit value="Сохранить" style="background:<? echo $SETTINGS["COLORS"]["FrmBtn"];?>;">&nbsp;&nbsp;
+ <input type=reset value="Очистить" style="background:<? echo $SETTINGS["COLORS"]["FrmBtn"];?>;">
+ </td>
+</tr>
+</form>
+</table>
+<br>
+<br>

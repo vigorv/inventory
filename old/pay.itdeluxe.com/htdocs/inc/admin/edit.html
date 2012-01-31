@@ -1,0 +1,43 @@
+<?
+$rows=$this->get_admin_edit_rows();
+if(isset($this->PARAMS["lock_id"])&&$this->PARAMS["lock_id"]==1)$islock_id=1;///вставить автоматически id, 1 только если мы хотим менять id
+else $islock_id=0;
+?>
+<table cellpadding=2 cellspacing=1>
+<form method=post action="<?echo $_SERVER["PHP_SELF"];?>" ENCTYPE="multipart/form-data" name="forma">
+<?$i=0;$color=($i%2==0)?$SETTINGS["COLORS"]["Frm1"]:$SETTINGS["COLORS"]["Frm2"];$i++;?>
+<tr bgcolor="<?echo $color;?>">
+ <td colspan=2 align=center>
+ <b>Редактирование/Добавление</b>
+ </td>
+</tr>
+<?
+?>
+
+<?foreach($rows as $key => $attrs){?>
+  <?$color=($i%2==0)?$SETTINGS["COLORS"]["Frm1"]:$SETTINGS["COLORS"]["Frm2"];$i++;?>
+  <tr bgcolor="<?echo $color;?>" valign=top>
+   <td align=right><?=$attrs["string"]?></td>
+   <?if(!isset($this->PARAMS["current"][$key]))$this->PARAMS["current"][$key]="";?>
+   <td> <?=$this->get_edit_string($attrs,$this->PARAMS["current"][$key]);?></td>
+  </tr>
+  <?}?>
+
+ 
+ <?$color=($i%2==0)?$SETTINGS["COLORS"]["Frm1"]:$SETTINGS["COLORS"]["Frm2"];$i++;?>
+<tr bgcolor="<?echo $color;?>">
+ <td colspan=2 align=center>
+ <input type=hidden name="act" value="save">
+ <?if(isset($f)){?><input type=hidden name="f" value="<?echo $f;?>"><?}?>
+ <?if(isset($d)){?><input type=hidden name="d" value="<?echo $d;?>"><?}?>
+ <?if(isset($s)){?><input type=hidden name="s" value="<?echo $s;?>"><?}?>
+ <?if(isset($p)&&$p>0){?><input type=hidden name="p" value="<?echo $p;?>"><?}?>
+ <?if(isset($id)&&$islock_id==0){?><input type=hidden name="id" value="<?echo $id;?>"><?}?>
+ <input type=submit value="Сохранить" style="background:<? echo $SETTINGS["COLORS"]["FrmBtn"];?>;">&nbsp;&nbsp;
+ <input type=reset value="Очистить" style="background:<? echo $SETTINGS["COLORS"]["FrmBtn"];?>;">
+ </td>
+</tr>
+</form>
+</table>
+<br>
+<br>

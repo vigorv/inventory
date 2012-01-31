@@ -1,0 +1,48 @@
+<?
+header_no_cache();
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<title>
+<?echo $SETTINGS["SERVER_NAME"];?> - Администрирование
+</title>
+<style type="text/css">
+<!--
+html {margin:0px; padding:0px}
+BODY {COLOR: #000000;background: #FFFFFF; FONT-FAMILY: Verdana,serif; FONT-SIZE: 13px; margin:0px; padding:0px}
+p {margin: 0}
+P:first-letter {margin-left:15px}
+td {FONT-SIZE: 13px }
+A { FONT-SIZE: 12px; COLOR: #294172; TEXT-DECORATION: none }
+A:hover { FONT-SIZE: 12px; COLOR: #000066; TEXT-DECORATION: underline }
+.tbg {background: #E6f1fA}
+.thead {background: #A6CEEE}
+.trow1 {background: #C9E9FC}
+.trow2 {background: #B9D9EC}
+.tspandark {background: #294172}
+.tspanwhite {background: #FFFFFF}
+FORM  {margin-top : 0px; margin-bottom : 0px;}
+SELECT,INPUT, TEXTAREA { border: solid #A6CEEE 1px; font-family:Verdana,serif; font-size:11px;}
+.CHECKBOX{ border: none; font-size:8px;}
+.red {color:#FF0000}
+.green {color:#008000}
+-->
+</style>
+</head>
+<body onload="self.focus();">
+<table cellpadding=0 cellspacing=0 class=tbg height="100%" width="100%" border=0>
+  <tr valign=top>
+   <td class=tspanwhite height=17><IMG height=17 width=17 src="<?=$SETTINGS["SERVER_URL"]?>/img/admin/cortl.gif" alt=""></td>
+   <td width="100%" bgcolor="#A6CEEE" align=center>
+    <b><?echo $this->PARAMS["part_name"]; ?></b>
+   </td>
+   <td class=tspanwhite><IMG height=17 width=17 src="<?=$SETTINGS["SERVER_URL"]?>/img/admin/cortr.gif" alt=""></td>
+  </tr>
+  <tr><td colspan=3 height=2 class=tspandark>
+  </td></tr>
+  <tr><td colspan=3 valign=top>
+   <table cellpadding=4 cellspacing=0 height="100%" width="100%" border=0>
+    <tr><td valign=top>

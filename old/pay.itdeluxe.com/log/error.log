@@ -1,0 +1,41 @@
+[Wed Apr 18 13:10:04 2007] [error] [client 192.168.200.100] File does not exist: /usr/local/www/pay.itdeluxe.com/htdocs/favicon.ico
+[Wed Apr 18 15:20:23 2007] [error] [client 192.168.200.102] File does not exist: /usr/local/www/pay.itdeluxe.com/htdocs/favicon.ico
+[Wed Apr 18 15:43:47 2007] [error] [client 192.168.200.102] File does not exist: /usr/local/www/pay.itdeluxe.com/htdocs//img/1x1.gif
+[Wed Apr 18 15:43:54 2007] [error] [client 192.168.200.102] File does not exist: /usr/local/www/pay.itdeluxe.com/htdocs//img/1x1.gif
+[Wed Apr 18 15:44:02 2007] [error] [client 192.168.200.102] File does not exist: /usr/local/www/pay.itdeluxe.com/htdocs//img/1x1.gif
+[Wed Apr 18 15:44:07 2007] [error] [client 192.168.200.102] File does not exist: /usr/local/www/pay.itdeluxe.com/htdocs//img/1x1.gif
+[Wed Apr 18 15:44:14 2007] [error] [client 192.168.200.102] File does not exist: /usr/local/www/pay.itdeluxe.com/htdocs//img/1x1.gif
+[Wed Apr 18 15:46:15 2007] [error] [client 192.168.200.102] File does not exist: /usr/local/www/pay.itdeluxe.com/htdocs//img/1x1.gif
+[Wed Apr 18 15:46:20 2007] [error] [client 192.168.200.102] File does not exist: /usr/local/www/pay.itdeluxe.com/htdocs//img/1x1.gif
+[Wed Apr 18 15:46:20 2007] [error] [client 192.168.200.102] File does not exist: /usr/local/www/pay.itdeluxe.com/htdocs//img/1x1.gif
+[Wed Apr 18 15:46:21 2007] [error] [client 192.168.200.102] File does not exist: /usr/local/www/pay.itdeluxe.com/htdocs//img/1x1.gif
+[Wed Apr 18 15:46:21 2007] [error] [client 192.168.200.102] File does not exist: /usr/local/www/pay.itdeluxe.com/htdocs//img/1x1.gif
+[Thu Apr 19 18:52:23 2007] [error] [client 192.168.200.100] File does not exist: /usr/local/www/pay.itdeluxe.com/htdocs/favicon.ico
+[Thu Apr 19 18:53:09 2007] [error] [client 192.168.200.100] File does not exist: /usr/local/www/pay.itdeluxe.com/htdocs/favicon.ico
+[Fri Apr 20 10:19:23 2007] [error] mod_ssl: SSL handshake failed (server pay.itdeluxe.com:443, client 203.204.125.163) (OpenSSL library error follows)
+[Fri Apr 20 10:19:23 2007] [error] OpenSSL: error:1408E0F4:SSL routines:SSL3_GET_MESSAGE:unexpected message
+[Fri Apr 20 10:47:11 2007] [error] [client 192.168.200.102] File does not exist: /usr/local/www/pay.itdeluxe.com/htdocs/favicon.ico
+[Tue Apr 24 20:07:30 2007] [error] mod_ssl: SSL handshake failed (server pay.itdeluxe.com:443, client 217.123.49.132) (OpenSSL library error follows)
+[Tue Apr 24 20:07:30 2007] [error] OpenSSL: error:140760FC:SSL routines:SSL23_GET_CLIENT_HELLO:unknown protocol [Hint: speaking not SSL to HTTPS port!?]
+[Wed Apr 25 23:18:07 2007] [error] mod_ssl: SSL handshake failed (server pay.itdeluxe.com:443, client 193.179.215.150) (OpenSSL library error follows)
+[Wed Apr 25 23:18:07 2007] [error] OpenSSL: error:1408E0F4:SSL routines:SSL3_GET_MESSAGE:unexpected message
+[Wed May  2 18:53:31 2007] [error] mod_ssl: SSL handshake failed (server pay.itdeluxe.com:443, client 195.178.53.4) (OpenSSL library error follows)
+[Wed May  2 18:53:31 2007] [error] OpenSSL: error:1408E0F4:SSL routines:SSL3_GET_MESSAGE:unexpected message
+[Thu May  3 03:56:24 2007] [error] mod_ssl: SSL handshake failed (server pay.itdeluxe.com:443, client 202.69.160.5) (OpenSSL library error follows)
+[Thu May  3 03:56:24 2007] [error] OpenSSL: error:1408E0F4:SSL routines:SSL3_GET_MESSAGE:unexpected message
+[Thu May  3 14:20:29 2007] [error] mod_ssl: SSL handshake failed (server pay.itdeluxe.com:443, client 59.125.204.97) (OpenSSL library error follows)
+[Thu May  3 14:20:29 2007] [error] OpenSSL: error:1408E0F4:SSL routines:SSL3_GET_MESSAGE:unexpected message
+[Sat May  5 17:08:32 2007] [error] mod_ssl: SSL handshake failed (server pay.itdeluxe.com:443, client 216.249.103.55) (OpenSSL library error follows)
+[Sat May  5 17:08:32 2007] [error] OpenSSL: error:1408E0F4:SSL routines:SSL3_GET_MESSAGE:unexpected message
+[Sat May  5 17:33:03 2007] [error] mod_ssl: SSL handshake failed (server pay.itdeluxe.com:443, client 217.123.49.132) (OpenSSL library error follows)
+[Sat May  5 17:33:03 2007] [error] OpenSSL: error:140760FC:SSL routines:SSL23_GET_CLIENT_HELLO:unknown protocol [Hint: speaking not SSL to HTTPS port!?]
+[Sun May  6 01:40:25 2007] [error] mod_ssl: SSL handshake failed (server pay.itdeluxe.com:443, client 61.220.143.118) (OpenSSL library error follows)
+[Sun May  6 01:40:25 2007] [error] OpenSSL: error:1408E0F4:SSL routines:SSL3_GET_MESSAGE:unexpected message
+[Mon May  7 10:04:50 2007] [error] mod_ssl: SSL handshake failed (server pay.itdeluxe.com:443, client 217.123.49.132) (OpenSSL library error follows)
+[Mon May  7 10:04:50 2007] [error] OpenSSL: error:140760FC:SSL routines:SSL23_GET_CLIENT_HELLO:unknown protocol [Hint: speaking not SSL to HTTPS port!?]
+[Tue May  8 08:08:32 2007] [error] mod_ssl: SSL handshake failed (server pay.itdeluxe.com:443, client 59.125.204.97) (OpenSSL library error follows)
+[Tue May  8 08:08:32 2007] [error] OpenSSL: error:1408E0F4:SSL routines:SSL3_GET_MESSAGE:unexpected message
+[Thu May 24 20:26:55 2007] [error] mod_ssl: SSL handshake failed (server pay.itdeluxe.com:443, client 217.6.103.199) (OpenSSL library error follows)
+[Thu May 24 20:26:55 2007] [error] OpenSSL: error:1408E0F4:SSL routines:SSL3_GET_MESSAGE:unexpected message
+[Mon May 28 05:16:59 2007] [error] mod_ssl: SSL handshake failed (server pay.itdeluxe.com:443, client 190.54.36.228) (OpenSSL library error follows)
+[Mon May 28 05:16:59 2007] [error] OpenSSL: error:1408E0F4:SSL routines:SSL3_GET_MESSAGE:unexpected message

@@ -1,0 +1,32 @@
+<?
+//$pay=$_REQUEST["pay"];
+$type=$_POST["paysystem"];
+$attrs=$this->PARAMS["pay_systems"][$type];
+$pay=(float)$this->payment["sum"];
+$cost= new cost();
+$pay=$cost->get_cost2($pay,$attrs["currency"]);
+$article=$_POST["article"];
+$ip=new IP();
+if($ip->get_referer())
+{
+    if($pay>0)
+    {
+        $id=$this->reserve_id();
+        switch ($type){
+            case "WMR":include $SETTINGS["PATH_INC"]."/pay/wm.html";break;
+            case "WMZ":include $SETTINGS["PATH_INC"]."/pay/wm.html";break;
+            case "RuPay":include $SETTINGS["PATH_INC"]."/pay/RuPay.html";break;
+            case "bil":include $SETTINGS["PATH_INC"]."/pay/billing.html";break;
+            case "Yandex":include $SETTINGS["PATH_INC"]."/pay/yad.html";break;
+            case "NetUP":include $SETTINGS["PATH_INC"]."/pay/netup.html";break;
+        }
+    }
+    else
+    {
+        echo "Ошибка суммы платежа<br><a href='#' onclick='javascript:history.back();'><<вернуться</a>";
+    }
+}
+else echo " Внутренняя ошибка 0х1b";//Попытка попасть на страницу откуда не надо
+?>
+
+ 

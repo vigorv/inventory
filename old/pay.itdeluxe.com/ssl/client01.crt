@@ -1,0 +1,48 @@
+Certificate:
+    Data:
+        Version: 1 (0x0)
+        Serial Number: 1 (0x1)
+        Signature Algorithm: md5WithRSAEncryption
+        Issuer: C=RU, L=Novosibirsk, O=IT Deluxe, CN=itdeluxe.com/emailAddress=support@itdeluxe.com
+        Validity
+            Not Before: Nov 13 05:09:08 2006 GMT
+            Not After : Nov 13 05:09:08 2007 GMT
+        Subject: C=RU, O=IT Deluxe, CN=pay.itdeluxe.com/emailAddress=support@itdeluxe.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+            RSA Public Key: (1024 bit)
+                Modulus (1024 bit):
+                    00:b5:e2:bf:49:67:3c:f7:36:f9:0f:80:e9:46:a2:
+                    fb:8e:99:a7:2d:d0:ec:7e:96:45:fb:f2:0d:0b:29:
+                    dc:14:6e:82:af:df:31:3b:99:5a:63:6b:50:4d:28:
+                    22:a3:de:f9:6d:35:fb:5d:f2:a3:2f:d9:e1:1a:58:
+                    66:b1:b8:9e:88:80:68:47:f4:c2:30:62:51:10:77:
+                    00:00:54:3c:49:af:76:24:e4:a7:0a:76:6a:37:1a:
+                    73:19:46:99:8c:7e:da:d2:2d:db:bd:e4:9b:ae:e5:
+                    42:97:c5:58:7b:51:35:ac:cb:51:0c:ca:79:1e:7e:
+                    37:9d:5d:a7:36:c2:4b:ac:eb
+                Exponent: 65537 (0x10001)
+    Signature Algorithm: md5WithRSAEncryption
+        4c:98:18:e2:b4:58:8f:9e:d4:a3:8d:d8:6e:b8:37:df:a6:e9:
+        9a:5f:c1:47:51:ac:9c:fc:08:f9:2e:39:d0:4f:3e:45:09:a6:
+        50:65:a5:b5:1d:fd:fd:30:b1:21:ee:c0:a2:98:7a:43:d3:4f:
+        fc:b6:16:fd:68:85:8a:ce:33:47:ba:cc:ba:3f:a5:2a:fd:f6:
+        af:d3:4e:e3:fc:26:d7:54:7f:75:ac:92:33:7b:fb:76:25:b9:
+        60:33:90:45:0a:ef:be:d3:ff:f3:c7:2d:0e:04:62:02:96:33:
+        79:31:17:19:84:77:f6:f8:3d:50:b5:bb:e8:40:97:62:da:4d:
+        5d:0b
+-----BEGIN CERTIFICATE-----
+MIICQzCCAawCAQEwDQYJKoZIhvcNAQEEBQAwczELMAkGA1UEBhMCUlUxFDASBgNV
+BAcTC05vdm9zaWJpcnNrMRIwEAYDVQQKEwlJVCBEZWx1eGUxFTATBgNVBAMTDGl0
+ZGVsdXhlLmNvbTEjMCEGCSqGSIb3DQEJARYUc3VwcG9ydEBpdGRlbHV4ZS5jb20w
+HhcNMDYxMTEzMDUwOTA4WhcNMDcxMTEzMDUwOTA4WjBhMQswCQYDVQQGEwJSVTES
+MBAGA1UEChMJSVQgRGVsdXhlMRkwFwYDVQQDExBwYXkuaXRkZWx1eGUuY29tMSMw
+IQYJKoZIhvcNAQkBFhRzdXBwb3J0QGl0ZGVsdXhlLmNvbTCBnzANBgkqhkiG9w0B
+AQEFAAOBjQAwgYkCgYEAteK/SWc89zb5D4DpRqL7jpmnLdDsfpZF+/INCyncFG6C
+r98xO5laY2tQTSgio975bTX7XfKjL9nhGlhmsbieiIBoR/TCMGJREHcAAFQ8Sa92
+JOSnCnZqNxpzGUaZjH7a0i3bveSbruVCl8VYe1E1rMtRDMp5Hn43nV2nNsJLrOsC
+AwEAATANBgkqhkiG9w0BAQQFAAOBgQBMmBjitFiPntSjjdhuuDffpumaX8FHUayc
+/Aj5LjnQTz5FCaZQZaW1Hf39MLEh7sCimHpD00/8thb9aIWKzjNHusy6P6Uq/fav
+007j/CbXVH91rJIze/t2JblgM5BFCu++0//zxy0OBGICljN5MRcZhHf2+D1Qtbvo
+QJdi2k1dCw==
+-----END CERTIFICATE-----

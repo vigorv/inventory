@@ -1,0 +1,72 @@
+<?
+$add_str="";
+$rows=$this->PARAMS["pay_systems"];
+
+$article="";$br="<br>\n";
+$service=($this->PARAMS['service'])?$this->PARAMS['service']:0;
+$article_name=($this->PARAMS['current']['article_name'])?$this->PARAMS['current']['article_name']:'';
+$service_name=($this->PARAMS['current']['service_name'])?$this->PARAMS['current']['service_name']:'';
+$article=($this->PARAMS['current']['article'])?$this->PARAMS['current']['article']:0;
+if(isset($this->PARAMS['current']['cost']))$pay=$this->PARAMS['current']['cost'];
+$hash=($this->PARAMS['service_hash'])?$this->PARAMS['service_hash']:'';
+$article_t=($article>0)?"hidden":"name";
+
+if($service>0)
+{
+    $serv_t=($service>0)?"hidden":"name";
+    $pay_t=($pay)?"hidden":"name";
+    $br=($article>0)?"\n":"<br>\n";
+    $br1=($pay)?"\n":"<br>\n";
+}
+else
+{
+    $services=$this->get_services2pay();
+}
+
+//if($service==32)$article_name="за фильм";
+
+//$cost= new cost();
+//$pay=$cost->get_cost("RUR");
+if($pay)$add_str=" <b>".$pay." RUR</b>";
+
+?>
+<div align="center" >Вы хотите заплатить за <b><?=$article_name.$add_str?>:</b></div>
+<form action=""<?echo $_SERVER["PHP_SELF"];?>"" name="pay" method="POST">
+<div align="left" style="margin-left: 400px; margin-right: 0px"> 
+<?
+if($service==0)
+{
+    echo "Cервис:<br>";
+    $hash = $services;
+    $out_str="\n<select name=\"service\">\n";
+    foreach($hash as $key0=>$val){
+        $out_str.="<option value='".$key0."'>".$val['name']."</option>\n";
+    }
+    $out_str.="</select>\n<br>";
+    echo $out_str;
+
+}
+else{
+    echo "<br>Cервис:<b>".$service_name."</b><br>";
+    ?>
+    <input type="hidden" name="service" value="<?=$service?>">
+    <?
+}
+        ?>
+<?if($article==0)echo "Артикль:<br>";?>
+<input type="<?=$article_t?>" name="article" value="<?=$article?>"><?=$br?>
+<?if(!$pay)echo "Сумму:<br>";?>
+<input type="<?=$pay_t?>" name="pay" value="<?=$pay?>"><?=$br1?>
+<input type="hidden" name="hash" value="<?=$hash?>">
+
+<br>по сисметеме оплаты:<br>
+<?foreach ($rows as $k => $v) {
+    if($this->PARAMS["default_pay_system"]==$k)$sel="checked"; else $sel="";
+    if(isset($v["locked"])&&$v["locked"]=="1")$sel1="disabled"; else $sel1="";
+		?>
+<input type="radio" name="paysystem" value="<?=$k?>" <?=$sel?> <?=$sel1?>><?=$v["name"]?><br>
+<?}?>
+<input type="hidden" name="act" value="pay">
+<input type="hidden" name="article_name" value="<?=$article_name?>">
+<input type="submit" name="button" value=" оплатить">
+</div>

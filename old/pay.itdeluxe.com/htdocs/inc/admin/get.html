@@ -1,0 +1,48 @@
+<?  $razd=$this->get_razd();
+$rows=$this->get_admin_get_rows();
+?>
+
+<table cellpadding=2 cellspacing=1>
+  <? $i=0; $color=($i%2==0)?$SETTINGS["COLORS"]["Frm1"]:$SETTINGS["COLORS"]["Frm2"];$i++;?>
+  <tr bgcolor="<?echo $color;?>"><td colspan=2 align=right>
+<a href="<?echo $this->PARAMS["out_url"].$razd;?>act=edit&id=<?echo $this->PARAMS["id"];?>"><?echo get_img("Edit");?></a>
+<a href="<?echo $this->PARAMS["out_url"].$razd;?>act=del&id=<?echo $this->PARAMS["id"];?>" onclick="return confirm('Удалить?')"><?echo get_img("Del");?></a>
+  </td></tr>
+  
+	<?
+	foreach($rows as $key => $attrs){?>
+  <?$color=($i%2==0)?$SETTINGS["COLORS"]["Frm1"]:$SETTINGS["COLORS"]["Frm2"];$i++;?>
+  <tr bgcolor="<?echo $color;?>" valign=top>
+   <?
+   	switch ($attrs["show"]["type"])
+   	{
+   		case "%act%":
+   						$t="<a href=\"".$this->PARAMS["out_url"].$razd."act=".$key."&id=".$this->PARAMS["id"]."&active=".$this->PARAMS["current"][$key]."\">".get_img($this->PARAMS["current"][$key])."</a></td>";
+				   		break;
+   		case "%id%":
+   						$t=$this->get_param("id");
+				   		break;
+			case "%pict%":
+ 						if(isset($this->PARAMS["current"][$key])&&$this->PARAMS["current"][$key]!="")
+					$t="<br><img src=\"".$this->PARAMS["current"][$key]."\"><a href=\"javascript:void(0);\"
+					onClick=\"window.open('".$SETTINGS["SERVER_URL"]."/admin/".$this->PARAMS["url_link"]."?act=del_pict&id=".$this->PARAMS["id"]."&pic=".$key."','help','width=650,height=50,,left=40,top=100, status=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes');\">
+					".get_img("Del")."</a>";
+   					else $t="отсутствует";
+			   		break;
+			case "%time%":
+   						$t=getTimeWork($this->PARAMS["current"][$key]);
+				   		break;
+      case "":
+      			 $t=$this->PARAMS["current"][$key];
+             break;
+   		default:
+		   				$t=$this->PARAMS["1forN"][$attrs["show"]["type"]][$this->PARAMS["current"][$key]]['name'];
+   	}
+   ?>
+   <td align=right><?=$attrs["string"]?></td>
+   <td><?echo $t;?></td>
+  </tr>
+  <?}?>
+
+</table>
+<br><br>

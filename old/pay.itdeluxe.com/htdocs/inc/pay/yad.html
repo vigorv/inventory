@@ -1,0 +1,36 @@
+Вы хотите совершить платеж через платежную систему Yandex.Money
+
+<!---<form method="POST" action="http://money.yandex.ru/select-wallet.xml"> -->
+<form method="POST" action="http://demomoney.yandex.ru/select-wallet.xml">
+
+
+<!---
+<input type="hidden" name="TargetCurrency" value="643"><?/*код валюты - рубли*/?>
+<input type="hidden" name="currency" value="643><?/*код валюты - рубли*/?>
+-->
+<input type="hidden" name="TargetCurrency" value="10643"><?/*код валюты - рубли*/?>
+<input type="hidden" name="currency" value="10643><?/*код валюты - рубли*/?>
+
+<input type="hidden" name="wbp_InactivityPeriod" value="2">
+<input type="hidden" name="wbp_ShopAddress" value="wn1.paycash.ru:8828">
+<input type="hidden" name="wbp_ShopEncryptionKey" value="hAAAEicBAHV6wr3pySqE3thhKHb...">
+<input type="hidden" name="wbp_ShopKeyID" value="4060341894">
+<input type="hidden" name="wbp_Version" value="1.0">
+<input type="hidden" name="wbp_CorrespondentID" value="8994748E663DE6B3C68D2D9931B079C74789D4B4">
+
+<!---
+<input type="hidden" name="BankID" value="100"> <?/*идентификатор процессингового центра платежной системы*/ ?>
+<input type="hidden" name="TargetBankID" value="1001"> <?/*идентификатор процессингового центра платежной системы*/ ?>
+-->
+
+<input type="hidden" name="BankID" value="1003"> <?/*идентификатор процессингового центра платежной системы*/ ?>
+<input type="hidden" name="TargetBankID" value="1003"> <?/*идентификатор процессингового центра платежной системы*/ ?>
+
+<input type="hidden" name="PaymentTypeCD" value="PC"> <?/*тип платежа: по технологии PayCash*/ ?>
+<input type="hidden" name="ShopID" value="12"> <?/*идентификатор магазина в ЦПП - уникальное значение, присваивается Магазину платежной системой*/?>
+<input type=hidden name="CustomerNumber" value="<?=$id?>" >
+
+<input type=hidden name="Sum" value="<?=$pay?>">
+<input type=hidden name="OrderDetails" value="<?=$article?>"><?/*Содержание заказа:*/?>
+<input type=submit value="заплатить <?=$pay?> <?=$attrs["currency"]?>...">
+</form>

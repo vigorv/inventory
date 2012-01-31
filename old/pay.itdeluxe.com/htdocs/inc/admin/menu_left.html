@@ -1,0 +1,105 @@
+<?
+/*
+$PARAMS["menu_obj"] - 
+			array("katalog.phtml","Каталог",2)
+			       ссылка- название- количество пробелов перед картинкой    
+*/
+
+$MENU["menu_obj"]=array(
+								"admin"=>array(
+															array("admin_parts.php","Разделы")
+															,array("admin_users.php","Администраторы")
+															),
+								"moder"=>array(
+															array("wm_manage.php",'Платежы')
+								                            //,array("country.php",'Страны')
+								                            ,array("wm_stat.php",'Статистика')
+
+															)
+								);
+								
+function echo_menu_obj($i,$type="admin",$MENU){
+ global $SETTINGS;
+ if(isset($MENU["menu_obj"][$type][$i][2]))$nbsps=$MENU["menu_obj"][$type][$i][2];else $nbsps=0;
+?>
+    <tr><td><? for($j=0;$j<$nbsps;$j++)echo "&nbsp;";?>
+<img height=7 width=7 src="<? echo $SETTINGS["IMG_URL"];?>/admin/menu_point.gif" alt="">
+<a href="<?=$MENU["menu_obj"][$type][$i][0];?>"><?=$MENU["menu_obj"][$type][$i][1];?></a>
+    </td></tr>
+<?if($i!=count($MENU["menu_obj"][$type])-1){?>    <tr><td bgcolor="#FFFFFF" height=1>
+    </td></tr>
+<?} else {?>
+	 </table>
+  <tr><td colspan=2 height=4 bgcolor="#FFFFFF">
+  </td></tr>
+<?}}?>
+
+<?if(isset($_SESSION["ADMN_USER_TYPE"]) && $_SESSION['ADMN_USER_TYPE']==0){?>
+<table cellpadding=0 cellspacing=0 bgcolor="#E6f1fA" width="100%" border=0>
+  <tr>
+   <td height=17 width="100%" valign=top bgcolor="#A6CEEE" nowrap>
+    &nbsp;&nbsp;<b>Админу</b>
+   </td>
+   <td bgcolor="#FFFFFF"><IMG height=17 width=17 src="<?echo $SETTINGS["IMG_URL"]; ?>/admin/cortr.gif" alt=""></td>
+  </tr>
+  <tr><td colspan=2 height=2 bgcolor="#294172">
+  </td></tr>
+  <tr><td style="padding: 2px;" colspan=2 valign=top>
+   <table cellpadding=0 cellspacing=0 width="100%" border=0>
+<!-- Menu Админу -->
+<? $type="admin";
+for($i=0;$i<count($MENU["menu_obj"][$type]);$i++)echo_menu_obj($i,$type,$MENU);?>
+</table>
+<?}?>
+
+
+<table cellpadding=0 cellspacing=0 bgcolor="#E6f1fA" width="100%" border=0>
+  <tr>
+   <td height=17 width="100%" valign=top bgcolor="#A6CEEE" nowrap>
+    &nbsp;&nbsp;<b>Модератору</b>
+   </td>
+   <td bgcolor="#FFFFFF"><IMG height=17 width=17 src="<?echo $SETTINGS["IMG_URL"]; ?>/admin/cortr.gif" alt=""></td>
+  </tr>
+  <tr><td colspan=2 height=2 bgcolor="#294172">
+  </td></tr>
+  <tr><td style="padding: 2px;" colspan=2 valign=top>
+   <table cellpadding=0 cellspacing=0 width="100%" border=0>
+<!-- Menu Модератору -->
+<? $type="moder";
+for($i=0;$i<count($MENU["menu_obj"][$type]);$i++)echo_menu_obj($i,$type,$MENU);?>
+</table>
+
+
+<table cellpadding=0 cellspacing=0 bgcolor="#E6f1fA" width="100%" border=0>
+  <tr>
+   <td height=17 width="100%" valign=top bgcolor="#A6CEEE" nowrap>
+    &nbsp;&nbsp;<b>Общее</b>
+   </td>
+   <td bgcolor="#FFFFFF"><IMG height=17 width=17 src="<?echo $SETTINGS["IMG_URL"]; ?>/admin/cortr.gif" alt=""></td>
+  </tr>
+  <tr><td colspan=2 height=2 bgcolor="#294172">
+  </td></tr>
+  <tr><td style="padding: 2px;" colspan=2 valign=top>
+   <table cellpadding=0 cellspacing=0 width="100%" border=0>
+<!-- Menu Общее -->
+    <tr><td>
+<img height=7 width=7 src="<? echo $SETTINGS["IMG_URL"];?>/admin/menu_point.gif" alt="">
+<?if(isset($_SERVER["REQUEST_URI"])){
+	$PATH_INFO=$_SERVER["REQUEST_URI"];
+	if(isset($this))$PARAMS["part_name"]=$this->PARAMS["part_name"];else $PARAMS["part_name"]=$PARAMS["part_name"];
+	}else $PATH_INFO="";?>
+<a href="javascript:void(0);" onClick="window.open('<?echourl("help.phtml?part_name=".urlencode($PARAMS["part_name"])."&part_html=".substr(basename($PATH_INFO),0,strrpos(basename($PATH_INFO),".")));?>','help','width=500,height=300, status=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes');">Помощь (конт.)</a>
+    </td></tr>
+    <tr><td bgcolor="#FFFFFF" height=1>
+    </td></tr>
+    <tr><td>
+<img height=7 width=7 src="<? echo $SETTINGS["IMG_URL"];?>/admin/menu_point.gif" alt="">
+<a href="login.php?act=logout">Выход</a>
+    </td></tr>
+   </table>
+  </td>
+  </tr>
+  <tr><td colspan=2 height=4 bgcolor="#FFFFFF">
+  </td></tr>
+</table>
+

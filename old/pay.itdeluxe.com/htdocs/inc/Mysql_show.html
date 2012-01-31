@@ -1,0 +1,19 @@
+<?
+	if($mysql->is_errors()){	 echo "<br>&nbsp;".$mysql->get_errors();}
+	else{
+			if($sql_type=="create")echo "Создана таблица<br>";
+			elseif($sql_type=="drop")echo "Удалена таблица<br>";
+			else{if($PARAMS["info"]!="")echo "Запрос затронул ".$PARAMS["info"]." рядов<br/>";
+			else echo "MySQL вернула пустой результат (т.е. ноль рядов).<br/>";
+		if(isset($PARAMS["current"][0])){$cols=array_keys($PARAMS["current"][0]);?>
+	  	Результат выполнения запроса:<br>
+	  	<table border=1><?
+   		foreach ($cols as $col){ echo "<td>".$col."&nbsp;</td>";}
+	  		foreach ($PARAMS["current"] as $cur) 
+    		{?><tr><?
+    			foreach ($cols as $col){ echo "<td>".$cur[$col]."&nbsp;</td>";}
+    		?></tr><?
+    		}?>
+  		</table><br>
+		<?}else{?>Запрос выполнен<br>
+<?}}}?>

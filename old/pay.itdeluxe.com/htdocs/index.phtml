@@ -1,0 +1,26 @@
+<?
+include_once "config.inc.php";
+include_once PATH_API."/wm.class.php";
+
+$wm= new wm();
+$wm->action_user();
+debug_echo();
+/*$_REQUEST=array(
+	"rupay_action"=>"sys",
+	"rupay_user"=>"stell_hawk@mail.ru",
+	"rupay_id"=>"2001117582",
+	"rupay_sum"=>"0.01","rupay_user_plat"=>"stell_hawk@ngs.ru","name_service"=>"Интернет",
+	"order_id"=>"RU768166340","rupay_hash"=>"7d691b982207e5b0823989ae79e5a849");
+$iii="";
+$iii=$_REQUEST["rupay_action"]."::";
+$iii.=$_REQUEST["rupay_user"]."::";
+$iii.=$_REQUEST["rupay_id"]."::";
+$iii.=$_REQUEST["rupay_sum"]."::";
+$iii.=$_REQUEST["rupay_user_plat"]."::";
+$iii.=$_REQUEST["name_service"]."::";
+$iii.=$_REQUEST["order_id"]."::";
+$iii.="3247";
+
+if (md5($iii)==$_REQUEST["rupay_hash"])echo ">>TRUE";else echo ">>FALSE";
+*/
+?>

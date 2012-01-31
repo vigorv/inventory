@@ -1,0 +1,11 @@
+<form method="POST" action=""<?echo $_SERVER["PHP_SELF"];?>"">
+ƒействительно хотите заплатить через NetUP?
+    <input type="hidden" name="order_id" value="<?=$id?>">
+    <input type="hidden"name="pay" value="<?=$pay?>">
+    <input type="hidden" name="article" value="<?=$article?>">
+    <input type="hidden" name="act" value="paynetup">
+    <input type="hidden" name="paysystem" value="NetUP">
+    <input type="hidden" name="ip" value="<?=$ip->get_ip();?>">
+
+    <input type="submit" value="заплатить <?=$pay?>...">
+</form>

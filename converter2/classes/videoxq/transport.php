@@ -350,6 +350,7 @@ class partnerTransport
 							"title"				=> title			- название объекта
 							"title_original"	=> title_original	- оригинальное название объекта
 							"genres"			=> genres			- жанры через запятую
+							"countries"			=> countries		- страны через запятую
 							"description"		=> description		- описание объекта
 							"year"				=> year				- год
 							"poster"			=> poster			- относительный путь к файлу постера
@@ -380,7 +381,7 @@ class partnerTransport
 		mysql_query('SET NAMES ' . $this->dbs[$cfgName]['locale'], $db);
 
 		$sql = '
-			SELECT f.id, f.title, f.title_en, f.dir, f.description, f.year, ff.file_name, ff.id AS ffid, ff.md5 FROM films AS f
+			SELECT f.id, f.title, f.title_en, f.dir, f.description, f.year, fv.id AS ovid, ff.file_name, ff.id AS ffid, ff.md5 FROM films AS f
 				INNER JOIN film_variants as fv ON (fv.film_id = f.id)
 				INNER JOIN film_files AS ff ON (ff.film_variant_id = fv.id AND ff.cloud_compressor=0)
 			WHERE is_license=1 AND f.active > 0 ' . $condition . ' ORDER BY f.id ' . $limit . '
@@ -402,6 +403,7 @@ class partnerTransport
 			{
 				$files = array();
 				$md5s = array();
+				$ovids = array();
 			}
 
 			$letter = strtolower(substr($r['dir'], 0, 1));
@@ -409,6 +411,7 @@ class partnerTransport
 				$letter = '0-999';
 			$files[] = "/" . $letter . "/" . $r['dir'] . "/" . $r['file_name'];
 			$md5s[] = $r['md5'];
+			$ovids[] = $r['ovid'];
 			$sql = 'UPDATE film_files SET cloud_compressor = ' . _STATION_ . ' WHERE id = ' . $r['ffid'];
 			mysql_query($sql, $db);
 
@@ -422,6 +425,7 @@ class partnerTransport
 				'original_id' => $r['id'],
 				'files' => $files,
 				'md5s' => $md5s,
+				'ovids' => $ovids,
 				'tags' => $tags,
 			);
 		}
@@ -445,6 +449,20 @@ class partnerTransport
 				}
 				mysql_free_result($query);
 				$queue[$k]['tags']['genres'] = implode(', ', $genres);
+		//ОПРЕДЕЛЯЕМ СПИСОК СТРАН
+				$sql = '
+					SELECT c.title FROM countries AS c
+						INNER JOIN countries_films AS cf ON (cf.country_id = c.id)
+					WHERE cf.film_id = ' . $q['original_id'] . '
+				';
+				$countries = array();
+				$query = mysql_query($sql, $db);
+				while ($r = mysql_fetch_assoc($query))
+				{
+					$countries[] = $r['title'];
+				}
+				mysql_free_result($query);
+				$queue[$k]['tags']['countries'] = implode(', ', $countries);
 		//ОПРЕДЕЛЯЕМ ПОСТЕР
 				$sql = 'SELECT file_name, type FROM film_pictures WHERE film_id = ' . $q['original_id'];
 				$genres = $smallPosters = $bigPosters = $posters = array();

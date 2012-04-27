@@ -188,6 +188,7 @@ class cConverter
 							$this->setQueueState($cmdInfo, _STATE_PROCESS_);//ИЗМЕНЯЕМ СОСТОЯНИЕ ОПЕРАЦИИ
 
 							$newFiles = array();
+							$filesPresets = array();//ХРАНИМ СПИСОК ПРЕСЕТОВ ДЛЯ КАЖДОГО НОВОГО ФАЙЛА
 							foreach ($info['files'] as $f)
 							{
 								$fInfo = pathinfo($f);
@@ -196,7 +197,7 @@ class cConverter
 								$newFiles[] = $path . _SL_ . $f2;//У ФАЙЛОВ НОВЫЕ ИМЕНА
 
 								$presets = $this->getPresetList($f);
-
+								$filesPresets[] = $presets;
 								foreach ($presets as $preset)
 								{
 									$p2 = _SL_ . $preset . $path;
@@ -238,7 +239,7 @@ class cConverter
 									}
 								}
 							}
-							$newFiles = array('newfiles' => $newFiles);
+							$newFiles = array('newfiles' => $newFiles, 'filepresets' => $filesPresets);
 							$this->setQueueInfo($cmdInfo, $newFiles);
 
 							$this->cmd($cmdInfo['id']);	//СОЗДАНИЕ ФАЙЛА ЗАВЕРШЕНИЯ ОПЕРАЦИИ
@@ -767,6 +768,7 @@ class cConverter
 /*
 				$info = array(
 					'files' => array('/m/megamozg_2010.avi', '', ...),
+					'ovids' => array, МАССИВ ИДЕНТИФИКАТОРОВ ОРИГИНАЛЬНЫХ ВАРИАНТОВ
 					'md5s' => array('', '' ...),
 					'tags'	=> array(
 						"title"				=> 'Название фильма',

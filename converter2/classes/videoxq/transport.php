@@ -39,7 +39,7 @@ class partnerTransport
 		{
 			foreach ($posters as $p)
 			{
-				$cmds[] = 'wget -O ' . _POSTER_PATH_ . $p . ' http://media1.anka.ws' . $p . ' 2>&1';
+				$cmds[] = 'wget -O ' . _POSTER_PATH_ . $p . ' http://data2.videoxq.com/img/catalog' . $p . ' 2>&1';
 			}
 		}
 		return $cmds;
@@ -286,43 +286,46 @@ class partnerTransport
 		mysql_close($db);
 
 		$cfgName = 'media1';
-		$db = mysql_connect($this->dbs[$cfgName]['host'], $this->dbs[$cfgName]['user'], $this->dbs[$cfgName]['pwd'], true);
-		if (!$db)
+		if (!empty($this->dbs[$cfgName]))
 		{
-			$this->errorMsg = 'Невозможно соединиться с БД ' . $this->dbs[$cfgName]['host'] . '@' . $this->dbs[$cfgName]['user'];
-			return false;
-		}
-		mysql_select_db($this->dbs[$cfgName]['name'], $db);
-		mysql_query('SET NAMES ' . $this->dbs[$cfgName]['locale'], $db);
+			$db = mysql_connect($this->dbs[$cfgName]['host'], $this->dbs[$cfgName]['user'], $this->dbs[$cfgName]['pwd'], true);
+			if (!$db)
+			{
+				$this->errorMsg = 'Невозможно соединиться с БД ' . $this->dbs[$cfgName]['host'] . '@' . $this->dbs[$cfgName]['user'];
+				return false;
+			}
+			mysql_select_db($this->dbs[$cfgName]['name'], $db);
+			mysql_query('SET NAMES ' . $this->dbs[$cfgName]['locale'], $db);
 
-		if ((count($filesIds2Delete) > 0) AND (count($filesIds2Delete) == count($filesNames2Delete)))
-		{
-			//ЕСЛИ НЕ ОСТАЛОСЬ НИ ОДНОГО НЕЗАМЕНЕННОГО ФАЙЛА, МОЖНО УДАЛЯТЬ
-			//УДАЛЯЕМ ФАЙЛЫ
-			$sql = 'DELETE FROM files WHERE FilmID = ' . $originalId . ' AND Name IN ("' . implode('","', $filesNames2Delete) . '")';
+			if ((count($filesIds2Delete) > 0) AND (count($filesIds2Delete) == count($filesNames2Delete)))
+			{
+				//ЕСЛИ НЕ ОСТАЛОСЬ НИ ОДНОГО НЕЗАМЕНЕННОГО ФАЙЛА, МОЖНО УДАЛЯТЬ
+				//УДАЛЯЕМ ФАЙЛЫ
+				$sql = 'DELETE FROM files WHERE FilmID = ' . $originalId . ' AND Name IN ("' . implode('","', $filesNames2Delete) . '")';
+				$q = mysql_query($sql, $db);
+
+			}
+			//ДОБАВЛЯЕМ ФАЙЛ В МЕДИАКАТАЛОГ
+			$fileInfo = array(
+				'Marked'	=> 0,
+				'FilmID'	=> $originalId,
+				'Name'		=> basename($newName),
+				'MD5'		=> $fInfo['md5'],
+				'Path'		=> _MEDIA_PATH_ . $fInfo['path'] . '/' . $preset . '/' . basename($newName),
+				'Size'		=> $fInfo['size'],
+				'ed2kLink'	=> '',
+				'dcppLink'	=> '',
+				'dateadd'	=> time(),
+				'isfilecheked'	=> 1,
+				'tomoveback'	=> 0,
+				'backpath'	=> '',
+			);
+			$sql = 'INSERT INTO files (ID, Marked, FilmID, Name, MD5, Path, Size, ed2kLink, dcppLink, dateadd, isfilecheked, tomoveback, backpath)
+			VALUES (NULL, ' . $fileInfo['Marked'] . ', ' . $fileInfo['FilmID'] . ', "' . $fileInfo['Name'] . '", "' . $fileInfo['MD5'] . '", "' . $fileInfo['Path'] . '", ' . $fileInfo['Size'] . ', "' . $fileInfo['ed2kLink'] . '", "' . $fileInfo['dcppLink'] . '", "' . $fileInfo['dateadd'] . '", ' . $fileInfo['isfilecheked'] . ', ' . $fileInfo['tomoveback'] . ', "' . $fileInfo['backpath'] . '")
+			';
 			$q = mysql_query($sql, $db);
-
+			mysql_close($db);
 		}
-		//ДОБАВЛЯЕМ ФАЙЛ В МЕДИАКАТАЛОГ
-		$fileInfo = array(
-			'Marked'	=> 0,
-			'FilmID'	=> $originalId,
-			'Name'		=> basename($newName),
-			'MD5'		=> $fInfo['md5'],
-			'Path'		=> _MEDIA_PATH_ . $fInfo['path'] . '/' . $preset . '/' . basename($newName),
-			'Size'		=> $fInfo['size'],
-			'ed2kLink'	=> '',
-			'dcppLink'	=> '',
-			'dateadd'	=> time(),
-			'isfilecheked'	=> 1,
-			'tomoveback'	=> 0,
-			'backpath'	=> '',
-		);
-		$sql = 'INSERT INTO files (ID, Marked, FilmID, Name, MD5, Path, Size, ed2kLink, dcppLink, dateadd, isfilecheked, tomoveback, backpath)
-		VALUES (NULL, ' . $fileInfo['Marked'] . ', ' . $fileInfo['FilmID'] . ', "' . $fileInfo['Name'] . '", "' . $fileInfo['MD5'] . '", "' . $fileInfo['Path'] . '", ' . $fileInfo['Size'] . ', "' . $fileInfo['ed2kLink'] . '", "' . $fileInfo['dcppLink'] . '", "' . $fileInfo['dateadd'] . '", ' . $fileInfo['isfilecheked'] . ', ' . $fileInfo['tomoveback'] . ', "' . $fileInfo['backpath'] . '")
-		';
-		$q = mysql_query($sql, $db);
-		mysql_close($db);
 	}
 
 	public function getObjectToQueue($originalId, $originalVariantId = 0)

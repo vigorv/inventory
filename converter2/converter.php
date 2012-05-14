@@ -795,6 +795,7 @@ class cConverter
 
 		if (empty($cnt) && !empty($this->threadCount))
 		{
+return; //ВРЕМЕННО НЕ ГЕНЕРИРУЕМ ОЧЕРЕДЬ. ОБРАБАТЫВАЕМ ТОЛЬКО ЗАЯВКИ ОТ ПОЛЬЗОВАТЕЛЕЙ
 			$this->log(_PARTNER_ . ' очередь партнера пуста. Запрос новой очереди');
 			$checkConn = $this->transport->checkConnections();
 			if ($checkConn)

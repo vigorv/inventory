@@ -1223,7 +1223,6 @@ return; //ВРЕМЕННО НЕ ГЕНЕРИРУЕМ ОЧЕРЕДЬ. ОБРАБ�
 		if (empty($this->cmdContent))
 		{
 			$this->log("Нечего исполнять. Список команд пуст.");
-			$this->releaseLog();
 			unlink($this->batName);
 			return;
 		}
@@ -1232,8 +1231,6 @@ return; //ВРЕМЕННО НЕ ГЕНЕРИРУЕМ ОЧЕРЕДЬ. ОБРАБ�
 		fclose($f);
 //return ;
 		exec("sh " . $this->batName . " 2> " . $this->batName . ".errors");
-		$this->releaseLog();
-		//$pr=popen("tail  &",'r');
 	}
 
 	public function log($str = '')

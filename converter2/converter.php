@@ -1123,6 +1123,7 @@ return; //ВРЕМЕННО НЕ ГЕНЕРИРУЕМ ОЧЕРЕДЬ. ОБРАБ�
 		if (file_exists($current))
 		{
 			die(iconv(_SOURCE_CHARSET_, _CONSOLE_CHARSET_, 'Скрипт уже запущен или принудительно завершен. подробнее см. лог-файл ' . $current));
+			return;
 		}
 
 		$f = fopen($current, 'w+'); //создать пустой лог для данной сессии
@@ -1231,6 +1232,7 @@ return; //ВРЕМЕННО НЕ ГЕНЕРИРУЕМ ОЧЕРЕДЬ. ОБРАБ�
 		fclose($f);
 //return ;
 		exec("sh " . $this->batName . " 2> " . $this->batName . ".errors");
+		$this->releaseLog();
 		//$pr=popen("tail  &",'r');
 	}
 
@@ -1248,12 +1250,12 @@ return; //ВРЕМЕННО НЕ ГЕНЕРИРУЕМ ОЧЕРЕДЬ. ОБРАБ�
 		$this->initLog();
 		$this->transport = new partnerTransport($dbs);
 		$this->queue();
+		$this->releaseLog();
 	}
 
 	public function __destruct()
 	{
 		$this->closeDb($this->db);
-		$this->releaseLog();
 	}
 }
 

@@ -72,9 +72,9 @@ DEFINE("_ROOT_PATH_",	"d:" . _SL_ . "vano" . _SL_ . "home" . _SL_ . "converter2"
 
 DEFINE("_SOURCE_CHARSET_", 'utf-8');			//UTF8 КОДИРОВКА КОНСОЛИ
 
-DEFINE("_SRC_PATH_",	"/mnt/catalog/catalog");	//путь к оригинальным файлам
-DEFINE("_SRC2_PATH_",	"/mnt/typhoon/ftp/trash");	//путь к оригинальным файлам
-DEFINE("_MEDIA_PATH_",	"/mnt/catalog/x/catalog");	//путь к файлам в медиакаталоге
+DEFINE("_SRC_PATH_",	"/mnt/catalog/catalog");	//путь к оригинальным файлам (aka блэйз)
+DEFINE("_SRC2_PATH_",	"/mnt/typhoon/ftp/trash");	//путь к оригинальным файлам (aka тайфун)
+DEFINE("_MEDIA_PATH_",	"/mnt/catalog/x/catalog");	//путь к файлам в медиакаталоге (aka медиа1)
 
 DEFINE("_POSTER_PATH_",	_ROOT_PATH_ . "posters");		//путь к файлам постеров
 DEFINE("_POSTER_SRC_",	"/mnt/media1");		//путь к файлам постеров

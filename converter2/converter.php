@@ -475,7 +475,6 @@ class cConverter
 					//ПЕРЕХОДИМ К СЛЕДУЮЩЕЙ ОПЕРАЦИИ
 					$this->setQueueState($cmdInfo, _STATE_WAIT_);
 					$this->setQueueCmd($cmdInfo, _CMD_PARTNERUP_);
-					$this->threadCount++;
 				break;
 				case _CMD_PARTNERUP_:
 //КОПИРОВАНИЕ ПРЕОБРАЗОВАННЫХ ФАЙЛОВ
@@ -545,7 +544,6 @@ class cConverter
 							//ПРОВЕРЯЕМ, СКОПИРОВАНО УСПЕШНО?
 							$this->setQueueState($cmdInfo, _STATE_WAIT_);
 							$this->setQueueCmd($cmdInfo, _CMD_SAVEBACK_);
-							$this->threadCount++;
 						break;
 					}
 				break;
@@ -608,7 +606,6 @@ class cConverter
 							//ПЕРЕХОДИМ К СЛЕДУЮЩЕЙ ОПЕРАЦИИ
 							$this->setQueueState($cmdInfo, _STATE_WAIT_);
 							$this->setQueueCmd($cmdInfo, _CMD_ADD_);
-							$this->threadCount++;
 						break;
 					}
 				break;

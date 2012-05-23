@@ -470,21 +470,22 @@ class partnerTransport
 				$sql = 'SELECT file_name, type FROM film_pictures WHERE film_id = ' . $q['original_id'];
 				$genres = $smallPosters = $bigPosters = $posters = array();
 				$query = mysql_query($sql);
+				$subDir = '/img/catalog/';
 				while ($p = mysql_fetch_array($query))
 				{
 					switch ($p['type'])
 					{
 						case "poster":
 							$dir = _SL_ . 'posters';
-							$posters[] = $dir . _SL_ . basename($p['file_name']);
+							$posters[] = $subDir . $dir . _SL_ . basename($p['file_name']);
 						break;
 						case "smallposter":
 							$dir = _SL_ . 'smallposters';
-							$smallPosters[] = $dir . _SL_ . basename($p['file_name']);
+							$smallPosters[] = $subDir . $dir . _SL_ . basename($p['file_name']);
 						break;
 						case "bigposter":
 							$dir = _SL_ . 'bigposters';
-							$bigPosters[] = $dir . _SL_ . basename($p['file_name']);
+							$bigPosters[] = $subDir . $dir . _SL_ . basename($p['file_name']);
 						break;
 					}
 				}

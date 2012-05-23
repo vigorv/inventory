@@ -811,7 +811,8 @@ return; //ВРЕМЕННО НЕ ГЕНЕРИРУЕМ ОЧЕРЕДЬ. ОБРАБ�
 						$info = array(
 							'files' => $q['files'],
 							'tags' => $q['tags'],
-							'md5s' => $q['md5s']
+							'md5s' => $q['md5s'],
+							'ovids' => $q['ovids']
 						);
 
 						$qInfo = array(

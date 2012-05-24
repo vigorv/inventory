@@ -343,6 +343,7 @@ class cConverter
 									}
 									else
 									{
+										$this->log('не найден файл ' . $fullName);
 								//СКОНВЕРТИРОВАННЫЙ ФАЙЛ РАЗДЕЛЕН
 										$part = 1;
 										while (file_exists(_CONV_PATH_ . $p2 . _SL_ . $this->formatPartedFilename($f2, $part))) {
@@ -413,6 +414,7 @@ class cConverter
 									}
 									else
 									{
+										$this->log('не найден файл ' . $fullName);
 								//СКОНВЕРТИРОВАННЫЙ ФАЙЛ РАЗДЕЛЕН
 										$part = 1;
 										while (file_exists(_CONV_PATH_ . $p2 . _SL_ . $this->formatPartedFilename($f2, $part))) {

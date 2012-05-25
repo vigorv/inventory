@@ -251,10 +251,13 @@ class cConverter
 							}
 
 							$this->setQueueCmd($cmdInfo, _CMD_MODIFY_);
-							$this->setQueueState($cmdInfo, _STATE_WAIT_);
+							//$this->setQueueState($cmdInfo, _STATE_WAIT_);
+							//ОСТАНАВЛИВАЕМ ПОСЛЕ КОНВЕРТАЦИИ ДЛЯ ОТЛАДКИ (ЧТОБЫ СБЭКАПИТЬ РЕЗУЛЬТАТЫ КОНВЕРТАЦИИ)
+							$this->setQueueState($cmdInfo, _STATE_ERR_);
 						break;
 					}
 				break;
+
 				case _CMD_MODIFY_:
 					switch ($cmdInfo['state'])
 					{
@@ -1229,8 +1232,8 @@ return; //ВРЕМЕННО НЕ ГЕНЕРИРУЕМ ОЧЕРЕДЬ. ОБРАБ�
 		fwrite($f, $this->cmdContent);
 		fclose($f);
 //return ;
-		//exec("sh " . $this->batName . " 2> " . $this->batName . ".errors");
-		system("sh " . $this->batName . " 2> " . $this->batName . ".errors");
+		exec("sh " . $this->batName . " 2> " . $this->batName . ".errors");
+		//system("sh " . $this->batName . " 2> " . $this->batName . ".errors");
 	}
 
 	public function log($str = '')

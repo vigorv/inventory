@@ -251,9 +251,9 @@ class cConverter
 							}
 
 							$this->setQueueCmd($cmdInfo, _CMD_MODIFY_);
-							//$this->setQueueState($cmdInfo, _STATE_WAIT_);
-							//ОСТАНАВЛИВАЕМ ПОСЛЕ КОНВЕРТАЦИИ ДЛЯ ОТЛАДКИ (ЧТОБЫ СБЭКАПИТЬ РЕЗУЛЬТАТЫ КОНВЕРТАЦИИ)
-							$this->setQueueState($cmdInfo, _STATE_ERR_);
+							$this->setQueueState($cmdInfo, _STATE_WAIT_);
+								//ОСТАНАВЛИВАЕМ ПОСЛЕ КОНВЕРТАЦИИ ДЛЯ ОТЛАДКИ (ЧТОБЫ СБЭКАПИТЬ РЕЗУЛЬТАТЫ КОНВЕРТАЦИИ)
+								//$this->setQueueState($cmdInfo, _STATE_ERR_);
 						break;
 					}
 				break;

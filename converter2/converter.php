@@ -1229,7 +1229,8 @@ return; //ВРЕМЕННО НЕ ГЕНЕРИРУЕМ ОЧЕРЕДЬ. ОБРАБ�
 		fwrite($f, $this->cmdContent);
 		fclose($f);
 //return ;
-		exec("sh " . $this->batName . " 2> " . $this->batName . ".errors");
+		//exec("sh " . $this->batName . " 2> " . $this->batName . ".errors");
+		system("sh " . $this->batName . " 2> " . $this->batName . ".errors");
 	}
 
 	public function log($str = '')

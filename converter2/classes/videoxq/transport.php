@@ -591,4 +591,12 @@ class partnerTransport
 		}
 		return $result;
 	}
+
+	public function clearCache($info)
+	{
+		if (!empty($info['original_id']))
+		{
+			file_get_contents('http://videoxq.com/media/clearcache/' . $info['original_id']);
+		}
+	}
 }

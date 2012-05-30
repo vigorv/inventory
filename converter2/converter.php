@@ -608,6 +608,10 @@ class cConverter
 						break;
 						case _STATE_PROCESS_:
 							//РЕЗУЛЬТАТ ВЫПОЛНЕНИЯ ПРЕДЫДУЩЕЙ ОПЕРАЦИИ МОЖНО НЕ ПРОВЕРЯТЬ
+
+							//!!! РЕЛИЗОВАТЬ СБРОС КЭША У ПАРТНЕРА
+							$this->transport->clearCache($cmdInfo);
+
 							//ПЕРЕХОДИМ К СЛЕДУЮЩЕЙ ОПЕРАЦИИ
 							$this->setQueueState($cmdInfo, _STATE_WAIT_);
 							$this->setQueueCmd($cmdInfo, _CMD_ADD_);

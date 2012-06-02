@@ -343,6 +343,7 @@ class partnerTransport
 	 *
 	 * формат возвращаемой структуры
 	 * 					$info['original_id'];
+	 * 					$info['just_online'];
 						$info['md5s'] = array(хэши md5, соответствующих файлов)
 						$info['files'] = array(
 							относительный путь к I-му файлу объекта в примонтированной директории
@@ -384,7 +385,7 @@ class partnerTransport
 		mysql_query('SET NAMES ' . $this->dbs[$cfgName]['locale'], $db);
 
 		$sql = '
-			SELECT f.id, f.title, f.title_en, f.dir, f.description, f.year, fv.id AS ovid, ff.file_name, ff.id AS ffid, ff.md5 FROM films AS f
+			SELECT f.id, f.title, f.title_en, f.dir, f.description, f.year, f.just_online, fv.id AS ovid, ff.file_name, ff.id AS ffid, ff.md5 FROM films AS f
 				INNER JOIN film_variants as fv ON (fv.film_id = f.id)
 				INNER JOIN film_files AS ff ON (ff.film_variant_id = fv.id AND ff.cloud_compressor=0)
 			WHERE is_license=1 AND f.active > 0 ' . $condition . ' ORDER BY f.id ' . $limit . '
@@ -426,6 +427,7 @@ class partnerTransport
 			);
 			$queue[$r['id']] = array(
 				'original_id' => $r['id'],
+				'just_online' => $r['just_online'],
 				'files' => $files,
 				'md5s' => $md5s,
 				'ovids' => $ovids,

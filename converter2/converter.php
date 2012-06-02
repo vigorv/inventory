@@ -820,10 +820,11 @@ return; //ВРЕМЕННО НЕ ГЕНЕРИРУЕМ ОЧЕРЕДЬ. ОБРАБ�
 					foreach ($queue as $q)
 					{
 						$info = array(
-							'files' => $q['files'],
-							'tags' => $q['tags'],
-							'md5s' => $q['md5s'],
-							'ovids' => $q['ovids']
+							'just_online'	=> $q['just_online'],
+							'files'			=> $q['files'],
+							'tags'			=> $q['tags'],
+							'md5s'			=> $q['md5s'],
+							'ovids'			=> $q['ovids']
 						);
 
 						$qInfo = array(

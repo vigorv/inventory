@@ -105,6 +105,8 @@ class cConverter
 						$this->setQueueCmd($cmdInfo, $qInfo['cmd_id']);
 						$this->setQueueState($cmdInfo, _STATE_WAIT_);
 						$this->setQueueInfo($cmdInfo, $info);
+						$sql = 'UPDATE dm_income_queue SET station_id = ' . _STATION_ . ' WHERE id = ' . $qInfo['cmd_id'];
+						mysql_query($sql, $this->db);
 					}
 				}
 			}

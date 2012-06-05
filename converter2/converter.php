@@ -91,9 +91,11 @@ class cConverter
 					foreach ($queue as $q)
 					{
 						$info = array(
+							'just_online' => $q['just_online'],
 							'files' => $q['files'],
+							'md5s' => $q['md5s'],
+							'ovids' => $ovids,
 							'tags' => $q['tags'],
-							'md5s' => $q['md5s']
 						);
 
 						$qInfo = array(

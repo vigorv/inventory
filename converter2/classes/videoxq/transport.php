@@ -365,7 +365,7 @@ class partnerTransport
 	{
 		if (empty($condition))
 		{
-			$limit = 'LIMIT 20';
+			$limit = 'LIMIT 2';
 		}
 		else
 		{

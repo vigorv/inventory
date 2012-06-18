@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cross-domain-policy>
+<allow-access-from domain="yui.yahooapis.com" secure="false"/>
+<allow-access-from domain="myicloud.ws" secure="false"/>
+<allow-access-from domain="tushkan" secure="false"/>
+</cross-domain-policy>

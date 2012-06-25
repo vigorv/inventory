@@ -64,19 +64,24 @@ class cConverter
 					return;
 				}
 
-				//ПРОВЕРЯЕМ ЕСТЬ ЛИ ОН УЖЕ В ВИТРИНАХ
-				if ($cmdInfo['original_variant_id'] > 0)
-					$sql = 'SELECT p.id FROM dm_products AS p INNER JOIN dm_product_variants AS pv ON (pv.product_id = p.id)
-						WHERE p.id = ' . $cmdInfo['original_id'] . ' AND pv.original_id = ' . $cmdInfo['original_variant_id'] . '
-						AND p.partner_id = ' . _PARTNER_ID_ . ' LIMIT 1
-					';
-				else
-					$sql = 'SELECT p.id FROM dm_products AS p WHERE p.id = ' . $cmdInfo['original_id'] . '
-						AND p.partner_id = ' . _PARTNER_ID_ . ' LIMIT 1
-					';
-				$r = mysql_query($sql, $this->db);
-				$productExists = mysql_fetch_assoc($r);
-				mysql_free_result($r);
+				//ПРОВЕРЯЕМ ЕСТЬ ЛИ ОН УЖЕ В ВИТРИНАХ ПАРТНЕРА
+				//КОНТЕНТ ФАЙЛОВЫХ СЕРВЕРОВ ОБЛАКА ОБРАБАТЫВАЕТСЯ ПОД partner_id = 0
+				if (!empty($cmdInfo['partner_id']))
+				{
+					if ($cmdInfo['original_variant_id'] > 0)
+						$sql = 'SELECT p.id FROM dm_products AS p INNER JOIN dm_product_variants AS pv ON (pv.product_id = p.id)
+							WHERE p.id = ' . $cmdInfo['original_id'] . ' AND pv.original_id = ' . $cmdInfo['original_variant_id'] . '
+							AND p.partner_id = ' . _PARTNER_ID_ . ' LIMIT 1
+						';
+					else
+						$sql = 'SELECT p.id FROM dm_products AS p WHERE p.id = ' . $cmdInfo['original_id'] . '
+							AND p.partner_id = ' . _PARTNER_ID_ . ' LIMIT 1
+						';
+					$r = mysql_query($sql, $this->db);
+					$productExists = mysql_fetch_assoc($r);
+					mysql_free_result($r);
+				}
+
 				if ($productExists)
 				{
 					//ПРОДУКТ УЖЕ В ВИТРИНАХ, ПЕРЕХОДИМ К ОПЕРАЦИИ ДОБАВЛЕНИЯ В ПП

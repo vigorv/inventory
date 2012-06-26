@@ -137,7 +137,7 @@ class cConverter
 							mysql_query($sql, $this->db);
 
 							$cmdFiles = $this->transport->copyFiles($info['files']);
-							$cmdPosters = $this->transport->copyPosters(array($info['tags']['poster']));
+							$cmdPosters = $this->transport->copyPosters(array($info['tags']));
 							$cmds = array();
 							if (!empty($cmdFiles)) foreach ($cmdFiles as $c)
 							{
@@ -880,9 +880,9 @@ class cConverter
 
 	public function getPosterKeys($r)
 	{
-		$poster = $r['poster'];
-		if (!empty($poster))
+		if (!empty($r['poster']))
 		{
+			$poster = $r['poster'];
 			//$poster = '--artwork ' . _POSTER_PATH_ . $p;
 			$poster = '-z --add ' . _POSTER_PATH_ . _SL_ . $poster;
 			//$txtInfo[] = "Постер\n" . _POSTER_PATH_ . _SL_ . $poster;

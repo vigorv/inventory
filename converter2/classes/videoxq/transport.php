@@ -35,9 +35,9 @@ class partnerTransport
 	public function copyPosters($posters)
 	{
 		$cmds = array();
-		if (!empty($posters))
+		if (!empty($posters['poster']))
 		{
-			foreach ($posters as $p)
+			foreach ($posters['poster'] as $p)
 			{
 				$cmds[] = 'wget -O ' . _POSTER_PATH_ . $p . ' http://data2.videoxq.com/img/catalog' . $p . ' 2>&1';
 			}

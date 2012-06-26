@@ -215,6 +215,7 @@ class cConverter
 										//УЗНАЕМ КОЛ-ВО ДОРОЖЕК
 										$numTracks = array();
 										exec('mediainfo --Inform="Audio;%ID%," ' . _COPY_PATH_ . $f, $numTracks);
+										$numTracks = trim($numTracks);
 										if (!empty($numTracks))
 										{
 											$numTracks = count(explode(',', $numTracks[0]));

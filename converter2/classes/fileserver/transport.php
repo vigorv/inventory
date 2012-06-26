@@ -61,6 +61,24 @@ class partnerTransport
 		return $cmd;
 	}
 
+    /**
+     * статическое описание пресетов
+     *
+     * !!ВНИМАНИЕ!! структура скопирована с модели CPresets проекта Myicloud
+     *
+     * @return mixed
+     */
+    public static function getPresets() {
+    	$presets = array(
+    		'unknown'	=> array('id' => 1, 'title' => 'unknown'),
+    		'low'		=> array('id' => 2, 'title' => 'low'),
+    		'medium'	=> array('id' => 3, 'title' => 'medium'),
+    		'high'		=> array('id' => 4, 'title' => 'high'),
+    		'ultra'		=> array('id' => 5, 'title' => 'ultra'),
+    	);
+    	return $presets;
+    }
+
 	/**
 	 * обновление информации о старом файле и внесение информации о новом (сконвертированном)
 	 *
@@ -74,7 +92,7 @@ class partnerTransport
 	{
 		$this->errorMsg = '';
 
-		$cfgName = 'videoxq';
+		$cfgName = 'mycloud';
 		$db = mysql_connect($this->dbs[$cfgName]['host'], $this->dbs[$cfgName]['user'], $this->dbs[$cfgName]['pwd'], true);
 		if (!$db)
 		{
@@ -84,235 +102,83 @@ class partnerTransport
 		mysql_select_db($this->dbs[$cfgName]['name'], $db);
 		mysql_query('SET NAMES ' . $this->dbs[$cfgName]['locale'], $db);
 
-		$sql = 'SELECT id FROM qualities WHERE title="' . $preset . '"';
+		$presets = $this->getPresets();
+		if (empty($presets[$preset]))
+			$qualityInfo = $presets['unknown'];//НЕ УСТАНОВЛЕНО
+		else
+			$qualityInfo = $presets[$preset];
+
+		//ВЫБИРАЕМ ИНФОРМАЦИЮ О НЕТИПИЗИРОВАННОМ ФАЙЛЕ
+		$sql = '
+			SELECT fv.id, fl.server_id, fl.state, fl.folder FROM dm_files_variants fv
+				INNER JOIN dm_filelocations AS fl ON (fl.id = fv.id)
+				WHERE fv.file_id = ' . $originalId . ' LIMIT 1
+		';
 		$q = mysql_query($sql, $db);
-		$qualityInfo = mysql_fetch_assoc($q);
+		$oldFileInfo = mysql_fetch_assoc($q);
 		mysql_free_result($q);
 
-		if (empty($qualityInfo['id']))
-		{
-			$qualityInfo['id'] = 1;//НЕ УСТАНОВЛЕНО
-		}
-
 		//ПРОВЕРЯЕМ СУЩЕСТВУЕТ ЛИ ВАРИАНТ С ТЕКУЩИМ КАЧЕСТВОМ
-		$sql = 'SELECT * FROM film_variants WHERE film_id = ' . $originalId . ' AND quality_id = ' . $qualityInfo['id'] . ' ORDER BY video_type_id ASC';
+		$sql = 'SELECT * FROM dm_files_variants WHERE file_id = ' . $originalId . ' AND preset_id = ' . $qualityInfo['id'] . ' ORDER BY preset_id ASC LIMIT 1';
 		$q = mysql_query($sql, $db);
 		$variantInfo = mysql_fetch_assoc($q);
 		mysql_free_result($q);
 
 		if (empty($variantInfo))
 		{
-			$sql = 'SELECT * FROM film_variants WHERE film_id = ' . $originalId . ' ORDER BY id ASC';
+			$sql = 'SELECT * FROM dm_files_variants WHERE file_id = ' . $originalId . ' ORDER BY id ASC LIMIT 1';
 			$q = mysql_query($sql, $db);
 			$originalInfo = mysql_fetch_assoc($q);
 			mysql_free_result($q);
 
 			//ЗНАЧИТ НУЖНО СОЗДАТЬ ВАРИАНТ ДЛЯ ДАННОГО КАЧЕСТВА
 			$variantInfo = array(
-				'film_id'		=> $originalId,
-				'video_type_id'	=> $originalInfo['video_type_id'],
-				'resolution'	=> $fInfo['resolution'],
-				'duration'		=> $originalInfo['duration'],
-				'active'		=> 1,
-				'created'		=> date('Y-m-d H:i:s'),
-				'modified'		=> date('Y-m-d H:i:s'),
-				'flag_catalog'	=> 0,
-				'quality_id'	=> $qualityInfo['id'],
+				'file_id'		=> $originalId,
+				'preset_id'		=> $qualityInfo['id'],
+				'fsize'			=> $fInfo['size'],
+				'fmd5'			=> $fInfo['size'],
 			);
 			$sql = '
-				INSERT INTO film_variants (id, film_id, video_type_id, resolution, duration, active, created, modified, flag_catalog, quality_id)
-				VALUES (null, ' . $variantInfo['film_id'] . ', ' . $variantInfo['video_type_id']
-			. ', "' . $variantInfo['resolution'] . '", "' . $variantInfo['duration'] . '", ' . $variantInfo['active']
-			. ', "' . $variantInfo['created'] . '", "' . $variantInfo['modified'] . '", ' . $variantInfo['flag_catalog']
-			. ', ' . $variantInfo['quality_id'] . ')
-			';
+				INSERT INTO dm_files_variants (id, file_id, preset_id, fsize, fmd5)
+				VALUES (null, ' . $variantInfo['file_id'] . ', ' . $variantInfo['preset_id']
+			. ', ' . $variantInfo['fsize'] . ', "' . $variantInfo['fmd5'] . '"'
+			. ')';
 			if (mysql_query($sql, $db))
 			{
 				$variantInfo['id'] = mysql_insert_id($db);
 			}
 			else
 			{
-				$this->errorMsg = 'Невозможно создать новый вариант фильма';
+				$this->errorMsg = 'Невозможно создать новый вариант файла';
 				mysql_close($db);
 				return false;
 			}
 		}
-		//ИЩЕМ СТАРЫЙ ФАЙЛ ЧТОБЫ ИЗМЕНИТЬ СТАТУС
-		/**
-		 * если старое и новое имя совпадает, выберем
-		 * 		дибо в оригинальном качестве (0)
-		 * 		либо текущем качестве
-		 */
-		$sql = 'SELECT ff.* FROM films AS f
-			INNER JOIN film_variants AS fv ON (fv.film_id = f.id)
-			INNER JOIN film_files as ff ON (ff.film_variant_id = fv.id)
-			WHERE f.id = ' . $originalId . ' AND  fv.quality_id IN (0, ' . $qualityInfo['id'] . ') AND ff.file_name LIKE "%' . $oldName . '"
-			ORDER BY fv.quality_id ASC
-		';
-		$q = mysql_query($sql, $db);
-		$oldFileInfo = mysql_fetch_assoc($q);
-		mysql_free_result($q);
+
+		//ТЕПЕРЬ ДОБАВЛЯЕМ НОВУЮ ЛОКАЦИЮ
+		$fileInfo = array(
+			'id' => $variantInfo['id'],
+			'server_id' => $oldFileInfo['server_id'], //$preset . '/' . basename($newName),
+			'state'		=> $oldFileInfo['state'],
+			'folder'	=> $oldFileInfo['folder'] . '/' . $preset . '/',
+			'fsize'		=> $fInfo['size'],
+			'fname'		=> basename($newName),
+		);
+		$sql = 'INSERT INTO dm_filelocations (id, server_id, state, fsize, fname, folder)
+		VALUES (' . $fileInfo['id'] . ', ' . $fileInfo['server_id'] . ', ' . $fileInfo['state'] . ', '
+		. $fileInfo['fsize'] . ', "' . $fileInfo['fname'] . '", "' . $fileInfo['folder'] . '"';
+		mysql_query($sql, $db);
+
 		if ($oldFileInfo)
 		{
-			//ОТМЕЧАЕМ ФАЙЛ КАК ГОТОВЫЙ К УДАЛЕНИЮ
-			$sql = 'UPDATE film_files SET cloud_ready = 0, cloud_state = ' . _CLOUD_STATE_SPIRIT_ . '
-				WHERE id = ' . $oldFileInfo['id'];
-			mysql_query($sql, $db);
-			//ИЩЕМ ИНФО ПО СТАРОМУ ТРЭКУ (audio_info)
-			$sql = 'SELECT * FROM tracks WHERE film_variant_id = ' . $oldFileInfo['film_variant_id'];
+			//УДАЛЯЕМ ФАЙЛ
+			$sql = 'DELETE FROM dm_filelocations WHERE id = ' . $oldFileInfo['id'];
 			$q = mysql_query($sql, $db);
-			$oldTrackInfo = mysql_fetch_assoc($q);
-			mysql_free_result($q);
-		}
-
-		if (empty($oldTrackInfo))
-		{
-			//ЕСЛИ СТАРОГО ФАЙЛА НЕТ (ЗНАЧИТ УЖЕ ЗАМЕНИЛИ ДРУГИМ КАЧЕСТВОМ)
-			//НУЖНО СКОПИРОВАТЬ ИНФОРМАЦИЮ C ТРЭКF ВАРИАНТА ДРУГОГО КАЧЕСТВА
-			$sql = 'SELECT t.* FROM films AS f
-				INNER JOIN film_variants AS fv ON (f.id = fv.film_id)
-				INNER JOIN tracks AS t ON (t.film_variant_id = fv.id)
-			WHERE f.id = ' . $originalId . ' AND fv.id <> ' . $variantInfo['id'];
+			//УДАЛЯЕМ ВАРИАНТ
+			$sql = 'DELETE FROM dm_files_variants WHERE id = ' . $oldFileInfo['id'];
 			$q = mysql_query($sql, $db);
-			$oldTrackInfo = mysql_fetch_assoc($q);
-			mysql_free_result($q);
-		}
-
-		if (!empty($oldTrackInfo))
-		{
-			//ПЕРЕСОХРАНЯЕМ НОВЫЙ ТРЭК К НОВОМУ ВАРИАНТУ
-			$sql = 'SELECT id FROM tracks WHERE film_variant_id = ' . $variantInfo['id'];
-			$q = mysql_query($sql, $db);
-			$existsTrackInfo = mysql_fetch_assoc($q);
-			mysql_free_result($q);
-			if (!$existsTrackInfo)
-			{
-				if (empty($qualityInfo['audio']))
-					$audioInfo = $oldTrackInfo['audio_info'];
-				else
-					$audioInfo = $qualityInfo['audio'];
-				$sql = 'INSERT INTO tracks (id, film_variant_id, language_id, translation_id, audio_info)
-				VALUES (NULL, ' . $variantInfo['id'] . ', ' . $oldTrackInfo['language_id'] . ', ' . $oldTrackInfo['translation_id'] . ', "' . $audioInfo . '")
-				';
-				mysql_query($sql, $db);
-			}
-		}
-
-		//ТЕПЕРЬ ДОБАВЛЯЕМ НОВЫЙ ФАЙЛ
-
-		//ПРОВЕРКА ДОБАВЛЯЛИ ИЛИ НЕТ
-		$sql = 'SELECT ff.* FROM films AS f
-			INNER JOIN film_variants AS fv ON (fv.film_id = f.id)
-			INNER JOIN film_files as ff ON (ff.film_variant_id = fv.id)
-			WHERE f.id = ' . $originalId . ' AND fv.quality_id = ' . $qualityInfo['id'] . ' AND ff.file_name = "' . ($preset . '/' . basename($newName)) . '"
-		';
-		$q = mysql_query($sql, $db);
-		$fileInfo = mysql_fetch_assoc($q);
-		mysql_free_result($q);
-		if (!$fileInfo)
-		{
-			//ДОБАВЛЯЕМ
-			$fileInfo = array(
-				'film_variant_id' => $variantInfo['id'],
-				'file_name' => $preset . '/' . basename($newName),
-				'size' => $fInfo['size'],
-				'md5' => $fInfo['md5'],
-				'dcpp_link' => '',
-				'ed2k_link' => '',
-				'server_id' => 0,
-				'is_lost' => 0,
-				'cloud_ready' => 1,
-				'cloud_state' => _CLOUD_STATE_ACTUAL_,
-				'cloud_compressor' => _STATION_,
-			);
-			$sql = 'INSERT INTO film_files (id, film_variant_id, file_name, size, md5, dcpp_link, ed2k_link, server_id, is_lost, cloud_ready, cloud_state, cloud_compressor)
-			VALUES (NULL, ' . $fileInfo['film_variant_id'] . ', "' . $fileInfo['file_name'] . '", ' . $fileInfo['size'] . ', "' . $fileInfo['md5'] . '", "' . $fileInfo['dcpp_link'] . '", "' . $fileInfo['ed2k_link'] . '", ' . $fileInfo['server_id'] . ', ' . $fileInfo['is_lost'] . ', ' . $fileInfo['cloud_ready'] . ', ' . $fileInfo['cloud_state'] . ', ' . $fileInfo['cloud_compressor'] . ')
-			';
-			mysql_query($sql, $db);
-		}
-		else
-		{
-			//ОБНОВИМ СТАТУС (НА СЛУЧАЙ, ЕСЛИ СТАРОЕ И НОВОЕ ИМЯ И КАЧЕСТВО СОВПАДАЮТ)
-			$sql = 'UPDATE film_files SET cloud_ready = 1, cloud_state = ' . _CLOUD_STATE_ACTUAL_ . '
-				WHERE id = ' . $fileInfo['id'];
-			mysql_query($sql, $db);
-		}
-
-		$filesIds2Delete = array();
-		$filesNames2Delete = array();//ДЛЯ МЕДИА КАТАЛОГА
-		if ($oldFileInfo)
-		{
-			//ТЕПЕРЬ ВЫБИРАЕМ СТАРЫЕ ЗАПИСИ О ФАЙЛАХ (СТАРОГО ВАРИАНТА), КОТОРЫЕ МОЖНО УДАЛИТЬ
-			$sql = 'SELECT ff.id, ff.file_name, ff.cloud_state FROM films AS f
-				INNER JOIN film_variants AS fv ON (fv.film_id = f.id)
-				INNER JOIN film_files as ff ON (ff.film_variant_id = fv.id)
-				WHERE f.id = ' . $originalId . ' AND fv.id = ' . $oldFileInfo['film_variant_id'] . ' AND ff.cloud_state > 0
-			';
-			$q = mysql_query($sql, $db);
-			while ($r = mysql_fetch_assoc($q))
-			{
-				$filesIds2Delete[] = $r['id'];
-				if ($r['cloud_state'] == _CLOUD_STATE_SPIRIT_)
-					$filesNames2Delete[] = basename($r['file_name']);
-			}
-			mysql_free_result($q);
-			if ((count($filesIds2Delete) > 0) AND (count($filesIds2Delete) == count($filesNames2Delete)))
-			{
-				//ЕСЛИ НЕ ОСТАЛОСЬ НИ ОДНОГО НЕЗАМЕНЕННОГО ФАЙЛА, МОЖНО УДАЛЯТЬ
-				//УДАЛЯЕМ ФАЙЛЫ
-				$sql = 'DELETE FROM film_files WHERE id IN (' . implode(',', $filesIds2Delete) . ')';
-				$q = mysql_query($sql, $db);
-				//УДАЛЯЕМ ВАРИАНТ
-				$sql = 'DELETE FROM film_variants WHERE id = ' . $oldFileInfo['film_variant_id'];
-				$q = mysql_query($sql, $db);
-				//УДАЛЯЕМ ТРЭК
-				$sql = 'DELETE FROM tracks WHERE film_variant_id = ' . $oldFileInfo['film_variant_id'];
-				$q = mysql_query($sql, $db);
-			}
 		}
 		mysql_close($db);
-
-		$cfgName = 'media1';
-		if (!empty($this->dbs[$cfgName]))
-		{
-			$db = mysql_connect($this->dbs[$cfgName]['host'], $this->dbs[$cfgName]['user'], $this->dbs[$cfgName]['pwd'], true);
-			if (!$db)
-			{
-				$this->errorMsg = 'Невозможно соединиться с БД ' . $this->dbs[$cfgName]['host'] . '@' . $this->dbs[$cfgName]['user'];
-				return false;
-			}
-			mysql_select_db($this->dbs[$cfgName]['name'], $db);
-			mysql_query('SET NAMES ' . $this->dbs[$cfgName]['locale'], $db);
-
-			if ((count($filesIds2Delete) > 0) AND (count($filesIds2Delete) == count($filesNames2Delete)))
-			{
-				//ЕСЛИ НЕ ОСТАЛОСЬ НИ ОДНОГО НЕЗАМЕНЕННОГО ФАЙЛА, МОЖНО УДАЛЯТЬ
-				//УДАЛЯЕМ ФАЙЛЫ
-				$sql = 'DELETE FROM files WHERE FilmID = ' . $originalId . ' AND Name IN ("' . implode('","', $filesNames2Delete) . '")';
-				$q = mysql_query($sql, $db);
-
-			}
-			//ДОБАВЛЯЕМ ФАЙЛ В МЕДИАКАТАЛОГ
-			$fileInfo = array(
-				'Marked'	=> 0,
-				'FilmID'	=> $originalId,
-				'Name'		=> basename($newName),
-				'MD5'		=> $fInfo['md5'],
-				'Path'		=> _MEDIA_PATH_ . $fInfo['path'] . '/' . $preset . '/' . basename($newName),
-				'Size'		=> $fInfo['size'],
-				'ed2kLink'	=> '',
-				'dcppLink'	=> '',
-				'dateadd'	=> time(),
-				'isfilecheked'	=> 1,
-				'tomoveback'	=> 0,
-				'backpath'	=> '',
-			);
-			$sql = 'INSERT INTO files (ID, Marked, FilmID, Name, MD5, Path, Size, ed2kLink, dcppLink, dateadd, isfilecheked, tomoveback, backpath)
-			VALUES (NULL, ' . $fileInfo['Marked'] . ', ' . $fileInfo['FilmID'] . ', "' . $fileInfo['Name'] . '", "' . $fileInfo['MD5'] . '", "' . $fileInfo['Path'] . '", ' . $fileInfo['Size'] . ', "' . $fileInfo['ed2kLink'] . '", "' . $fileInfo['dcppLink'] . '", "' . $fileInfo['dateadd'] . '", ' . $fileInfo['isfilecheked'] . ', ' . $fileInfo['tomoveback'] . ', "' . $fileInfo['backpath'] . '")
-			';
-			$q = mysql_query($sql, $db);
-			mysql_close($db);
-		}
 	}
 
 	public function getObjectToQueue($originalId, $originalVariantId = 0)

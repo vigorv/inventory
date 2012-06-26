@@ -135,7 +135,7 @@ class partnerTransport
 				'file_id'		=> $originalId,
 				'preset_id'		=> $qualityInfo['id'],
 				'fsize'			=> $fInfo['size'],
-				'fmd5'			=> $fInfo['size'],
+				'fmd5'			=> $fInfo['md5'],
 			);
 			$sql = '
 				INSERT INTO dm_files_variants (id, file_id, preset_id, fsize, fmd5)
@@ -165,7 +165,7 @@ class partnerTransport
 		);
 		$sql = 'INSERT INTO dm_filelocations (id, server_id, state, fsize, fname, folder)
 		VALUES (' . $fileInfo['id'] . ', ' . $fileInfo['server_id'] . ', ' . $fileInfo['state'] . ', '
-		. $fileInfo['fsize'] . ', "' . $fileInfo['fname'] . '", "' . $fileInfo['folder'] . '"';
+		. $fileInfo['fsize'] . ', "' . $fileInfo['fname'] . '", "' . $fileInfo['folder'] . '")';
 		mysql_query($sql, $db);
 
 		if ($oldFileInfo)

@@ -203,6 +203,7 @@ class cConverter
 								$fInfo = pathinfo($f);
 								$path = $fInfo['dirname'];//ДОЛЖЕН НАЧИНАТЬСЯ СО СЛЭША
 								$f2 = str_replace("." . $fInfo['extension'], '.mp4', $fInfo['basename']);//ЗАМЕНИЛИ РАСШИРЕНИЕ
+								//$f2 = $fInfo['filename'] . '.mp4';//ЗАМЕНИЛИ РАСШИРЕНИЕ
 								$newFiles[] = $path . _SL_ . $f2;//У ФАЙЛОВ НОВЫЕ ИМЕНА
 
 								$presets = $this->getPresetList($f);
@@ -675,6 +676,7 @@ class cConverter
 	public function formatPartedFilename($f2, $part)
 	{
 		$partedInfo = pathInfo($f2);
+		//$fParted = str_replace("." . $partedInfo['extension'], "_" . sprintf('%03d', $part) . "." . $partedInfo['extension'], $f2);
 		$fParted = str_replace("." . $partedInfo['extension'], "_" . sprintf('%03d', $part) . "." . $partedInfo['extension'], $f2);
 		return $fParted;
 	}
@@ -1273,6 +1275,7 @@ class cConverter
 
 	public function __construct($dbs)
 	{
+		setlocale(LC_ALL, 'ru_RU');
 		$this->dbs = $dbs;
 		$this->initLog();
 		$this->transport = new partnerTransport($dbs);

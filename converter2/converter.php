@@ -215,10 +215,10 @@ class cConverter
 										//УЗНАЕМ КОЛ-ВО ДОРОЖЕК
 										$numTracks = array();
 										exec('mediainfo --Inform="Audio;%ID%," ' . _COPY_PATH_ . $f, $numTracks);
-										$numTracks[0] = trim($numTracks[0]);
-										if (!empty($numTracks[0]))
+										$numTracks = trim($numTracks[0]);
+										if (!empty($numTracks))
 										{
-											$numTracks = count(explode(',', $numTracks[0]));
+											$numTracks = count(explode(',', $numTracks));
 											$this->log('найдено ' . $numTracks . ' дорожек во входном файле ' . _COPY_PATH_ . $f);
 											if ($numTracks > 1) $numTracks--;
 											if ($numTracks > _AUDIO_TRACKS_LIMIT_) $numTracks = _AUDIO_TRACKS_LIMIT_;

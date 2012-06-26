@@ -91,7 +91,6 @@ class partnerTransport
 	public function saveBack($originalId, $oldName, $newName, $preset, $fInfo)
 	{
 		$this->errorMsg = '';
-
 		$cfgName = 'mycloud';
 		$db = mysql_connect($this->dbs[$cfgName]['host'], $this->dbs[$cfgName]['user'], $this->dbs[$cfgName]['pwd'], true);
 		if (!$db)

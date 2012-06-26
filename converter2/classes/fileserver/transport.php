@@ -117,41 +117,27 @@ class partnerTransport
 		$oldFileInfo = mysql_fetch_assoc($q);
 		mysql_free_result($q);
 
-		//ПРОВЕРЯЕМ СУЩЕСТВУЕТ ЛИ ВАРИАНТ С ТЕКУЩИМ КАЧЕСТВОМ
-		$sql = 'SELECT * FROM dm_files_variants WHERE file_id = ' . $originalId . ' AND preset_id = ' . $qualityInfo['id'] . ' ORDER BY preset_id ASC LIMIT 1';
-		$q = mysql_query($sql, $db);
-		$variantInfo = mysql_fetch_assoc($q);
-		mysql_free_result($q);
-
-		if (empty($variantInfo))
+		//ЗНАЧИТ НУЖНО СОЗДАТЬ ВАРИАНТ ДЛЯ ДАННОГО КАЧЕСТВА
+		$variantInfo = array(
+			'file_id'		=> $originalId,
+			'preset_id'		=> $qualityInfo['id'],
+			'fsize'			=> $fInfo['size'],
+			'fmd5'			=> $fInfo['md5'],
+		);
+		$sql = '
+			INSERT INTO dm_files_variants (id, file_id, preset_id, fsize, fmd5)
+			VALUES (null, ' . $variantInfo['file_id'] . ', ' . $variantInfo['preset_id']
+		. ', ' . $variantInfo['fsize'] . ', "' . $variantInfo['fmd5'] . '"'
+		. ')';
+		if (mysql_query($sql, $db))
 		{
-			$sql = 'SELECT * FROM dm_files_variants WHERE file_id = ' . $originalId . ' ORDER BY id ASC LIMIT 1';
-			$q = mysql_query($sql, $db);
-			$originalInfo = mysql_fetch_assoc($q);
-			mysql_free_result($q);
-
-			//ЗНАЧИТ НУЖНО СОЗДАТЬ ВАРИАНТ ДЛЯ ДАННОГО КАЧЕСТВА
-			$variantInfo = array(
-				'file_id'		=> $originalId,
-				'preset_id'		=> $qualityInfo['id'],
-				'fsize'			=> $fInfo['size'],
-				'fmd5'			=> $fInfo['md5'],
-			);
-			$sql = '
-				INSERT INTO dm_files_variants (id, file_id, preset_id, fsize, fmd5)
-				VALUES (null, ' . $variantInfo['file_id'] . ', ' . $variantInfo['preset_id']
-			. ', ' . $variantInfo['fsize'] . ', "' . $variantInfo['fmd5'] . '"'
-			. ')';
-			if (mysql_query($sql, $db))
-			{
-				$variantInfo['id'] = mysql_insert_id($db);
-			}
-			else
-			{
-				$this->errorMsg = 'Невозможно создать новый вариант файла';
-				mysql_close($db);
-				return false;
-			}
+			$variantInfo['id'] = mysql_insert_id($db);
+		}
+		else
+		{
+			$this->errorMsg = 'Невозможно создать новый вариант файла';
+			mysql_close($db);
+			return false;
 		}
 
 		if ($oldFileInfo)

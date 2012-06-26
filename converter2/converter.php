@@ -112,7 +112,7 @@ class cConverter
 						$this->setQueueCmd($cmdInfo, $qInfo['cmd_id']);
 						$this->setQueueState($cmdInfo, _STATE_WAIT_);
 						$this->setQueueInfo($cmdInfo, $info);
-						$sql = 'UPDATE dm_income_queue SET station_id = ' . _STATION_ . ' WHERE id = ' . $qInfo['cmd_id'];
+						$sql = 'UPDATE dm_income_queue SET station_id = ' . _STATION_ . ' WHERE id = ' . $cmdInfo['id'];
 						mysql_query($sql, $this->db);
 					}
 				}
@@ -881,6 +881,7 @@ class cConverter
 
 	public function getPosterKeys($r)
 	{
+		$poster = '';
 		if (!empty($r['poster']))
 		{
 			$poster = $r['poster'];

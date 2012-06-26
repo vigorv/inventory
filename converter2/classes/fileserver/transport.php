@@ -317,7 +317,7 @@ class partnerTransport
 
 	public function getObjectToQueue($originalId, $originalVariantId = 0)
 	{
-		$condition = 'f.id = ' . $originalId;
+		$condition = 'uf.id = ' . $originalId;
 		if (!empty($originalVariantId))
 		{
 			$condition .= ' AND fv.id = ' . $originalVariantId;
@@ -376,7 +376,7 @@ class partnerTransport
 			SELECT uf.id, uf.title, fl.fname, fl.folder, fv.fmd5 FROM dm_userfiles AS uf
 				INNER JOIN dm_files_variants as fv ON (fv.file_id = uf.id)
 				INNER JOIN dm_filelocations AS fl ON (fl.id = fv.id)
-				WHERE fv.preset_id = 0 ORDER BY uf.id
+				WHERE fv.preset_id = 0 ' . $condition . ' ORDER BY uf.id
 		';
 		$q = mysql_query($sql, $db);
 		$currentId = 0;

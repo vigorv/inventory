@@ -26,7 +26,7 @@ class partnerTransport
 			foreach ($files as $f)
 			{
 				if (file_exists(_SRC_PATH_ . $f))
-					$cmds[] = 'rsync -r --delete-after --size-only ' . _SRC_PATH_ . $f . ' ' . _COPY_PATH_ . $f . ' 2>&1';
+					$cmds[] = 'rsync -r --delete-after --size-only "' . _SRC_PATH_ . $f . '" "' . _COPY_PATH_ . $f . '" 2>&1';
 			}
 		}
 		return $cmds;
@@ -57,7 +57,7 @@ class partnerTransport
 		$newDir = _SRC_PATH_ . $oldInfo['dirname'] . '/' . $subDir;
 //echo $newDir . "\n";
 		if ($this->createTree(_SRC_PATH_, $newDir))
-			$cmd[] = "rsync -r --delete-after --size-only " . $newName . " " . $newDir . '/' . basename($newName);
+			$cmd[] = "rsync -r --delete-after --size-only \"" . $newName . "\" \"" . $newDir . '/' . basename($newName) . '"';
 		return $cmd;
 	}
 

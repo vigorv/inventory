@@ -74,6 +74,11 @@ class partnerTransport
 		return $cmd;
 	}
 
+	public function dropOriginal($originalId)
+	{
+		return true;
+	}
+
 	/**
 	 * обновление информации о старом файле и внесение информации о новом (сконвертированном)
 	 *

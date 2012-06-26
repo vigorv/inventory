@@ -111,7 +111,7 @@ class partnerTransport
 		$sql = '
 			SELECT fv.id, fl.server_id, fl.state, fl.folder FROM dm_files_variants fv
 				INNER JOIN dm_filelocations AS fl ON (fl.id = fv.id)
-				WHERE fv.file_id = ' . $originalId . ' LIMIT 1
+				WHERE fv.file_id = ' . $originalId . ' AND fv.preset_id=0 LIMIT 1
 		';
 		$q = mysql_query($sql, $db);
 		$oldFileInfo = mysql_fetch_assoc($q);
@@ -155,15 +155,42 @@ class partnerTransport
 			VALUES (' . $fileInfo['id'] . ', ' . $fileInfo['server_id'] . ', ' . $fileInfo['state'] . ', '
 			. $fileInfo['fsize'] . ', "' . $fileInfo['fname'] . '", "' . $fileInfo['folder'] . '")';
 			mysql_query($sql, $db);
-
-			//УДАЛЯЕМ ФАЙЛ
-			$sql = 'DELETE FROM dm_filelocations WHERE id = ' . $oldFileInfo['id'];
-			$q = mysql_query($sql, $db);
-			//УДАЛЯЕМ ВАРИАНТ
-			$sql = 'DELETE FROM dm_files_variants WHERE id = ' . $oldFileInfo['id'];
-			$q = mysql_query($sql, $db);
 		}
 		mysql_close($db);
+	}
+
+	public function dropOriginal($originalId)
+	{
+		$this->errorMsg = '';
+		$cfgName = 'mycloud';
+		$db = mysql_connect($this->dbs[$cfgName]['host'], $this->dbs[$cfgName]['user'], $this->dbs[$cfgName]['pwd'], true);
+		if (!$db)
+		{
+			$this->errorMsg = 'Невозможно соединиться с БД ' . $this->dbs[$cfgName]['host'] . '@' . $this->dbs[$cfgName]['user'];
+			return false;
+		}
+		mysql_select_db($this->dbs[$cfgName]['name'], $db);
+		mysql_query('SET NAMES ' . $this->dbs[$cfgName]['locale'], $db);
+
+		$sql = '
+			SELECT fv.id, fl.server_id, fl.state, fl.folder FROM dm_files_variants fv
+				INNER JOIN dm_filelocations AS fl ON (fl.id = fv.id)
+				WHERE fv.file_id = ' . $originalId . ' AND fv.preset_id=0 LIMIT 1
+		';
+		$q = mysql_query($sql, $db);
+		$oldFileInfo = mysql_fetch_assoc($q);
+		mysql_free_result($q);
+
+		//УДАЛЯЕМ ФАЙЛ
+		$sql = 'DELETE FROM dm_filelocations WHERE id = ' . $oldFileInfo['id'];
+		$q = mysql_query($sql, $db);
+		//УДАЛЯЕМ ВАРИАНТ
+		$sql = 'DELETE FROM dm_files_variants WHERE id = ' . $oldFileInfo['id'];
+		$q = mysql_query($sql, $db);
+
+		mysql_close($db);
+
+		return true;
 	}
 
 	public function getObjectToQueue($originalId, $originalVariantId = 0)

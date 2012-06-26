@@ -610,6 +610,7 @@ class cConverter
 										return;
 									}
 								}
+								$this->transport->dropOriginal($cmdInfo['original_id']);
 							}
 							//УДАЛЯЕМ СТАРЫЙ КОНТЕНТ НА КОМПРЕССОРЕ И У ПАРТНЕРА
 							/**

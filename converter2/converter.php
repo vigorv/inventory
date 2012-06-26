@@ -933,6 +933,8 @@ class cConverter
 		}
 
 		$txtInfo = array();//ДЛЯ ВЫВОДА ТЭГОВ В ФАЙЛ
+		if (empty($r['title'])) $r['title'] = '';
+		if (empty($r['title_original'])) $r['title_original'] = '';
 		if (!$isMovie)
 		{
 			$r['title'] = trim(mb_eregi_replace("сезон" .'[\s]+[\d]+', '', $r['title']));
@@ -985,8 +987,13 @@ class cConverter
 		$title = '-s "' . $title . '"';//MP4BOX
 		//$title = '--title "' . $this->prepareMp4Tags(implode("/", $title)) . '" lang=rus ' . _CONSOLE_CHARSET_;//ATOMICPARSLET
 
-		$genre = '-g "' . $this->prepareMp4Tags($r['genres']) . '"';//MP4BOX
-		$txtInfo[] = "Жанр\n" . $this->prepareMp4Tags($r['genres']);
+		$genre = '';
+		if (!empty($r['genres']))
+		{
+			$genre = '-g "' . $this->prepareMp4Tags($r['genres']) . '"';//MP4BOX
+			$txtInfo[] = "Жанр\n" . $this->prepareMp4Tags($r['genres']);
+		}
+
 		//$genre = '--genre "' . $this->prepareMp4Tags(implode(', ', $genres)) . '" lang=rus ' . _CONSOLE_CHARSET_;//ATOMICPARSLET
 
 		if (empty($r["description"]))
@@ -1005,10 +1012,13 @@ class cConverter
 		//$longdesc = '--description "' . $this->prepareMp4Tags($r["description"]) . '" lang=rus ' . _CONSOLE_CHARSET_;//ATOMICPARSLET
 		$txtInfo[] = "Комментарий\n" . $this->prepareMp4Tags($r["description"]);
 
-		$year = '-y "' . $r["year"] . '"';//MP4BOX
-		//$year = '--year ' . $r["year"];//ATOMICPARSLET
-		$txtInfo[] = "Год\n" . $r["year"];
-
+		$year = '';
+		if (!empty($r["year"]))
+		{
+			$year = '-y "' . $r["year"] . '"';//MP4BOX
+			//$year = '--year ' . $r["year"];//ATOMICPARSLET
+			$txtInfo[] = "Год\n" . $r["year"];
+		}
 		if ($isMovie)
 			$type = 'movie'; //movie, tvshow etc
 		else

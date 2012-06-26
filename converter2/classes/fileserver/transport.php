@@ -154,22 +154,22 @@ class partnerTransport
 			}
 		}
 
-		//ТЕПЕРЬ ДОБАВЛЯЕМ НОВУЮ ЛОКАЦИЮ
-		$fileInfo = array(
-			'id' => $variantInfo['id'],
-			'server_id' => $oldFileInfo['server_id'], //$preset . '/' . basename($newName),
-			'state'		=> $oldFileInfo['state'],
-			'folder'	=> $oldFileInfo['folder'] . '/' . $preset . '/',
-			'fsize'		=> $fInfo['size'],
-			'fname'		=> basename($newName),
-		);
-		$sql = 'INSERT INTO dm_filelocations (id, server_id, state, fsize, fname, folder)
-		VALUES (' . $fileInfo['id'] . ', ' . $fileInfo['server_id'] . ', ' . $fileInfo['state'] . ', '
-		. $fileInfo['fsize'] . ', "' . $fileInfo['fname'] . '", "' . $fileInfo['folder'] . '")';
-		mysql_query($sql, $db);
-
 		if ($oldFileInfo)
 		{
+			//ТЕПЕРЬ ДОБАВЛЯЕМ НОВУЮ ЛОКАЦИЮ
+			$fileInfo = array(
+				'id' => $variantInfo['id'],
+				'server_id' => $oldFileInfo['server_id'], //$preset . '/' . basename($newName),
+				'state'		=> $oldFileInfo['state'],
+				'folder'	=> $oldFileInfo['folder'] . '/' . $preset . '/',
+				'fsize'		=> $fInfo['size'],
+				'fname'		=> basename($newName),
+			);
+			$sql = 'INSERT INTO dm_filelocations (id, server_id, state, fsize, fname, folder)
+			VALUES (' . $fileInfo['id'] . ', ' . $fileInfo['server_id'] . ', ' . $fileInfo['state'] . ', '
+			. $fileInfo['fsize'] . ', "' . $fileInfo['fname'] . '", "' . $fileInfo['folder'] . '")';
+			mysql_query($sql, $db);
+
 			//УДАЛЯЕМ ФАЙЛ
 			$sql = 'DELETE FROM dm_filelocations WHERE id = ' . $oldFileInfo['id'];
 			$q = mysql_query($sql, $db);

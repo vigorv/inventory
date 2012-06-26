@@ -216,7 +216,7 @@ class cConverter
 										$numTracks = array();
 										exec('mediainfo --Inform="Audio;%ID%," ' . _COPY_PATH_ . $f, $numTracks);
 										$numTracks[0] = trim($numTracks[0]);
-										if (!empty($numTracks))
+										if (!empty($numTracks[0]))
 										{
 											$numTracks = count(explode(',', $numTracks[0]));
 											$this->log('найдено ' . $numTracks . ' дорожек во входном файле ' . _COPY_PATH_ . $f);

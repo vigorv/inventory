@@ -82,7 +82,7 @@ class cConverter
 					mysql_free_result($r);
 				}
 
-				if ($productExists)
+				if (!empty($productExists))
 				{
 					//ПРОДУКТ УЖЕ В ВИТРИНАХ, ПЕРЕХОДИМ К ОПЕРАЦИИ ДОБАВЛЕНИЯ В ПП
 					$cmdInfo['cmd_id'] = _CMD_UNIVERSE_;
@@ -99,7 +99,7 @@ class cConverter
 							'just_online' => $q['just_online'],
 							'files' => $q['files'],
 							'md5s' => $q['md5s'],
-							'ovids' => $ovids,
+							'ovids' => $q['ovids'],
 							'tags' => $q['tags'],
 						);
 

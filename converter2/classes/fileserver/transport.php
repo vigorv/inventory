@@ -390,7 +390,7 @@ class partnerTransport
 			}
 
 			$files[] = "/" . $r['folder'] . "/" . $r['fname'];
-			$md5s[] = $r['md5'];
+			$md5s[] = $r['fmd5'];
 
 			$tags = array(
 				"title"				=> $r['title'],

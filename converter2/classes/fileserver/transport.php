@@ -228,8 +228,10 @@ class partnerTransport
 	 */
 	public function createQueue($condition = '')
 	{
+		$queue = array();
 		if (empty($condition))
 		{
+			return $queue;
 			$limit = 'LIMIT 2';
 		}
 		else
@@ -237,7 +239,6 @@ class partnerTransport
 			$limit = '';
 			$condition = ' AND ' . $condition;
 		}
-		$queue = array();
 		$cfgName = 'mycloud';
 		$this->errorMsg = '';
 		$db = mysql_connect($this->dbs[$cfgName]['host'], $this->dbs[$cfgName]['user'], $this->dbs[$cfgName]['pwd'], true);

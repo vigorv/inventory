@@ -382,7 +382,7 @@ class cConverter
 											}
 											else
 											{
-												$start = 0;
+												$start = $duration / 2;
 											}
 											if (!empty($start))
 											{

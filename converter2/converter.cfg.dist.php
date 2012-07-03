@@ -1,4 +1,8 @@
 <?php
+$neededFuncs = array('mb_substr', 'preg_match', 'mysql_connect');
+foreach ($neededFuncs as $f)
+	if (!function_exists($f))
+		die('function "' . $f . '" not defined. Plz fix PHP configuration.' . "\n\n");
 if (!defined("_PARTNER_"))
 {
 	die("Error. Not executable. (Try [_partner_name_].php)\n\n");

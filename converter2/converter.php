@@ -26,17 +26,20 @@ class cConverter
 		{
 			return;
 		}
-		if (!empty($cmdInfo['state']) && $this->operationIsFailed())
+		if (!empty($cmdInfo['state']))
 		{
+			if ($this->operationIsFailed())
+			{
 /*
 ПЕРЕД НАЧАЛОМ ОПЕРАЦИИ (state=0)
 ПРОВЕРКУ НАЛИЧИЯ ФАЙЛА ОШИБОК (.errors) НЕ ДЕЛАЕМ
 ФАЙЛ ОШИБОК МОГ ОСТАТЬСЯ ОТ ПРОШЛОЙ ОПЕРАЦИИ, ЗАВЕРШИВШЕЙСЯ ОШИБКОЙ
 И ПРИ СТАРТЕ С ПРОМЕЖУТОЧНОЙ ОПЕРАЦИИ ТАКАЯ ПРОВЕРКА НЕ НУЖНА
 */
-			$this->setQueueState($cmdInfo, _STATE_ERR_);
-			$this->threadCount++;
-			return;
+				$this->setQueueState($cmdInfo, _STATE_ERR_);
+				$this->threadCount++;
+				return;
+			}
 		}
 		if (!empty($info['files']) || ($cmdInfo['cmd_id'] == _CMD_TODO_))
 		{
@@ -1262,7 +1265,7 @@ class cConverter
 		fwrite($f, $this->cmdContent);
 		fclose($f);
 //return ;
-		exec("sh " . $this->batName . " 2> " . $this->batName . ".errors");
+		exec("sh " . $this->batName . " > " . $this->batName . ".out 1> " . $this->batName . ".echo 2> " . $this->batName . ".errors");
 		//system("sh " . $this->batName . " 2> " . $this->batName . ".errors");
 	}
 

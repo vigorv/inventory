@@ -232,7 +232,7 @@ class partnerTransport
 		if (empty($condition))
 		{
 			return $queue;
-			$limit = 'LIMIT 2';
+			$limit = 'LIMIT 5';
 		}
 		else
 		{

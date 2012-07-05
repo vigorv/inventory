@@ -1186,11 +1186,11 @@ class cConverter
 	 */
 	protected function initBat($cmdInfo)
 	{
-		$this->createTree(_ROOT_PATH_, _COPY_PATH_);
-		$this->createTree(_ROOT_PATH_, _CONV_PATH_);
-		$this->createTree(_ROOT_PATH_, _READY_PATH_);
-		$this->createTree(_ROOT_PATH_, _CMD_PATH_);
-		$this->createTree(_ROOT_PATH_, _TMP_PATH_);
+		$this->createTree(_COPY_PATH_);
+		$this->createTree(_CONV_PATH_);
+		$this->createTree(_READY_PATH_);
+		$this->createTree(_CMD_PATH_);
+		$this->createTree(_TMP_PATH_);
 
 		$this->batName = _CMD_PATH_ . _SL_ . _PARTNER_ . '.' . $cmdInfo['id'] . '.sh';
 		if (file_exists($this->batName))

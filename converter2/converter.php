@@ -1154,6 +1154,7 @@ class cConverter
 		$this->createTree(_READY_PATH_);
 		$this->createTree(_CMD_PATH_);
 		$this->createTree(_TMP_PATH_);
+		$this->createTree(_POSTER_PATH_);
 
 		$current = _LOG_PATH_ . _SL_ . $this->logFileName;
 		if (file_exists($current))

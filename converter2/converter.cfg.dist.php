@@ -48,31 +48,32 @@ DEFINE("_FFMPEG_KEYS_",	    '-deinterlace -r 29.97 -vcodec libx264 -flags +loop 
 //КЛЮЧИ ДЛЯ MPBOX
 DEFINE("_MP4BOX_KEYS_",	"");
 
-//DEFINE("_MP4BOX_MAX_SIZE_",	2 * 1048550); //МАКС РАЗМЕР ФАЙЛА ДЛЯ РАЗДЕЛЕНИЯ НА ЧАСТИ В КИЛОБАЙТАХ
-DEFINE("_MP4BOX_MAX_SIZE_",	2 * 1024 * 5); //МАКС РАЗМЕР ФАЙЛА ДЛЯ РАЗДЕЛЕНИЯ НА ЧАСТИ В КИЛОБАЙТАХ
+DEFINE("_MP4BOX_MAX_SIZE_",	2 * 1048550); //МАКС РАЗМЕР ФАЙЛА ДЛЯ РАЗДЕЛЕНИЯ НА ЧАСТИ В КИЛОБАЙТАХ
+//DEFINE("_MP4BOX_MAX_SIZE_",	2 * 1024 * 5); //МАКС РАЗМЕР ФАЙЛА ДЛЯ РАЗДЕЛЕНИЯ НА ЧАСТИ В КИЛОБАЙТАХ
 
-DEFINE("_FFMPEG_",		"d:" . _SL_ . "vano" . _SL_ . "tools" . _SL_ . "ffmpeg-0.5" . _SL_ . "ffmpeg.exe");	//путь к утилите ffmpeg
+DEFINE("_FFMPEG_",		_SL_ . "tools" . _SL_ . "ffmpeg-0.5" . _SL_ . "ffmpeg.exe");	//путь к утилите ffmpeg
 DEFINE("_MP4BOX_",		"MP4Box");		//путь к утилите mp4box
 DEFINE("_MP4TAGS_",		"/usr/local/bin/mp4tags");		//путь к утилите mp4tags
 DEFINE("_MP4ART_",		"/usr/local/bin/mp4art");		//путь к утилите mp4art
-DEFINE("_ATOMICP_",		"d:" . _SL_ . "vano" . _SL_ . "tools" . _SL_ . "atomicparsley" . _SL_ . "atomicparsley.exe");		//путь к утилите mp4tags
+DEFINE("_ATOMICP_",		_SL_ . "tools" . _SL_ . "atomicparsley" . _SL_ . "atomicparsley.exe");		//путь к утилите mp4tags
 
 
 DEFINE("_AUDIO_TRACKS_LIMIT_",	"7");	//максимально поддерживаемое кол-во аудио дорожек в видеофайле
 DEFINE("_QUEUE_CONDITION_",	"");	//дополнительное условие к выборке очереди
 //DEFINE("_CONDITION_",	"");	//дополнительное условие к выборке списка фильмов для конвертации
 DEFINE("_THREADS_CNT_",	1);	//Кол-во потоков
-DEFINE("_STATION_",		1);	//Номер рабочей станции
+
+DEFINE("_STATION_",		);	//УНИКАЛЬНЫЙ Номер рабочей станции. Сломано специально чтобы не пропустить при настройке
 
 DEFINE("_CATALOGURL_",	"http://media1.itd");
 
-DEFINE("_MYCLOUD_SITE_", "http://mycloud.anka.ws");
+DEFINE("_MYCLOUD_SITE_", "http://myicloud.ws");
 
 //DEFINE("_ROOT_PATH_",	_SL_ . "home" . _SL_ . "converter" . _SL_ );
-DEFINE("_CONSOLE_CHARSET_", '866');			//DOS КОДИРОВКА КОНСОЛИ
+//DEFINE("_CONSOLE_CHARSET_", '866');			//DOS КОДИРОВКА КОНСОЛИ
 
-DEFINE("_ROOT_PATH_",	"d:" . _SL_ . "vano" . _SL_ . "home" . _SL_ . "converter2" . _SL_ );
-//DEFINE("_CONSOLE_CHARSET_", 'utf-8');			//UTF8 КОДИРОВКА КОНСОЛИ
+DEFINE("_ROOT_PATH_",	_SL_ . "home" . _SL_ . "converter2" . _SL_ );
+DEFINE("_CONSOLE_CHARSET_", 'utf-8');			//UTF8 КОДИРОВКА КОНСОЛИ
 
 DEFINE("_SOURCE_CHARSET_", 'utf-8');			//UTF8 КОДИРОВКА КОНСОЛИ
 

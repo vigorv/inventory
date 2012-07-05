@@ -810,7 +810,8 @@ class cConverter
 				$this->log('сработало ограничение по количеству потоков max=' . _THREADS_CNT_);
 				break;
 			}
-			break;//ВЫПОЛНЯЕМ ПО ОДНОЙ ОПЕРАЦИИ НА КАЖДЫЙ ЗАПУСК КОНВЕРТЕРА
+			if (!empty($this->cmdContent))
+				break;//ВЫПОЛНЯЕМ ПО ОДНОМУ КОМАНДНОМУ ФАЙЛУ НА КАЖДЫЙ ЗАПУСК КОНВЕРТЕРА
 		}
 
 		$cnt = mysql_num_rows($q);

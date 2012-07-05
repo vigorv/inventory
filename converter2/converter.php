@@ -1148,8 +1148,8 @@ class cConverter
 	 */
 	protected function initLog()
 	{
-		if (!file_exists(_LOG_PATH_))
-			mkdir(_LOG_PATH_);
+		$this->createTree(_ROOT_PATH_, _LOG_PATH_);
+
 		$current = _LOG_PATH_ . _SL_ . $this->logFileName;
 		if (file_exists($current))
 		{
@@ -1186,8 +1186,11 @@ class cConverter
 	 */
 	protected function initBat($cmdInfo)
 	{
-		if (!file_exists(_CMD_PATH_))
-			mkdir(_CMD_PATH_);
+		$this->createTree(_ROOT_PATH_, _COPY_PATH_);
+		$this->createTree(_ROOT_PATH_, _CONV_PATH_);
+		$this->createTree(_ROOT_PATH_, _READY_PATH_);
+		$this->createTree(_ROOT_PATH_, _CMD_PATH_);
+		$this->createTree(_ROOT_PATH_, _TMP_PATH_);
 
 		$this->batName = _CMD_PATH_ . _SL_ . _PARTNER_ . '.' . $cmdInfo['id'] . '.sh';
 		if (file_exists($this->batName))
@@ -1214,8 +1217,6 @@ class cConverter
 			die(iconv(_SOURCE_CHARSET_, _CONSOLE_CHARSET_, 'Error. Невозможно создать командный файл ' . $this->batName));
 		}
 		fclose($f);
-		if (!file_exists(_TMP_PATH_))
-			mkdir(_TMP_PATH_);
 		$this->cmdContent = '';
 		return true;
 	}

@@ -37,10 +37,14 @@ class partnerTransport
 		$cmds = array();
 		if (!empty($posters['poster']))
 		{
+			$p = $posters['poster'];
+			$cmds[] = 'wget -O ' . _POSTER_PATH_ . $p . ' http://data2.videoxq.com/img/catalog' . $p . ' 2>&1';
+			/*
 			foreach ($posters['poster'] as $p)
 			{
 				$cmds[] = 'wget -O ' . _POSTER_PATH_ . $p . ' http://data2.videoxq.com/img/catalog' . $p . ' 2>&1';
 			}
+			*/
 		}
 		return $cmds;
 	}

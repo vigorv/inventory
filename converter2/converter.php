@@ -673,7 +673,7 @@ class cConverter
 				break;
 			}
 		}
-		$this->exec();
+//		$this->exec();
 	}
 
 	public function formatPartedFilename($f2, $part)
@@ -810,8 +810,9 @@ class cConverter
 				$this->log('сработало ограничение по количеству потоков max=' . _THREADS_CNT_);
 				break;
 			}
-//break;//ОТЛАДКА. ВЫПОЛНЯЕМ ПО ОДНОЙ ОПЕРАЦИИ
+			break;//ВЫПОЛНЯЕМ ПО ОДНОЙ ОПЕРАЦИИ НА КАЖДЫЙ ЗАПУСК КОНВЕРТЕРА
 		}
+
 		$cnt = mysql_num_rows($q);
 		mysql_free_result($q);
 
@@ -1259,13 +1260,15 @@ class cConverter
 		{
 			$this->log("Нечего исполнять. Список команд пуст.");
 			unlink($this->batName);
+			$this->releaseLog();
 			return;
 		}
+		$this->releaseLog();
 		$f = fopen($this->batName, 'a+'); //дописываем в конец
 		fwrite($f, $this->cmdContent);
 		fclose($f);
 //return ;
-		exec("sh " . $this->batName . " > " . $this->batName . ".out 1> " . $this->batName . ".echo 2> " . $this->batName . ".errors");
+		exec("sh " . $this->batName . " 2> " . $this->batName . ".errors");
 		//system("sh " . $this->batName . " 2> " . $this->batName . ".errors");
 	}
 
@@ -1284,7 +1287,7 @@ class cConverter
 		$this->initLog();
 		$this->transport = new partnerTransport($dbs);
 		$this->queue();
-		$this->releaseLog();
+		$this->exec();
 	}
 
 	public function __destruct()

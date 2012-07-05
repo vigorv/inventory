@@ -1149,6 +1149,11 @@ class cConverter
 	protected function initLog()
 	{
 		$this->createTree(_LOG_PATH_);
+		$this->createTree(_COPY_PATH_);
+		$this->createTree(_CONV_PATH_);
+		$this->createTree(_READY_PATH_);
+		$this->createTree(_CMD_PATH_);
+		$this->createTree(_TMP_PATH_);
 
 		$current = _LOG_PATH_ . _SL_ . $this->logFileName;
 		if (file_exists($current))
@@ -1186,12 +1191,6 @@ class cConverter
 	 */
 	protected function initBat($cmdInfo)
 	{
-		$this->createTree(_COPY_PATH_);
-		$this->createTree(_CONV_PATH_);
-		$this->createTree(_READY_PATH_);
-		$this->createTree(_CMD_PATH_);
-		$this->createTree(_TMP_PATH_);
-
 		$this->batName = _CMD_PATH_ . _SL_ . _PARTNER_ . '.' . $cmdInfo['id'] . '.sh';
 		if (file_exists($this->batName))
 		{

@@ -1148,7 +1148,7 @@ class cConverter
 	 */
 	protected function initLog()
 	{
-		$this->createTree(_ROOT_PATH_, _LOG_PATH_);
+		$this->createTree(_LOG_PATH_);
 
 		$current = _LOG_PATH_ . _SL_ . $this->logFileName;
 		if (file_exists($current))

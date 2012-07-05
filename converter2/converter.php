@@ -137,7 +137,7 @@ class cConverter
 							mysql_query($sql, $this->db);
 
 							$cmdFiles = $this->transport->copyFiles($info['files']);
-							$cmdPosters = $this->transport->copyPosters(array($info['tags']));
+							$cmdPosters = $this->transport->copyPosters($info['tags']);
 							$cmds = array();
 							if (!empty($cmdFiles)) foreach ($cmdFiles as $c)
 							{

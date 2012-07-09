@@ -114,5 +114,6 @@ DEFINE("_CLOUD_STATE_ACTUAL_",		2);//состояние файла - актуа�
 
 DEFINE("_COMPLETED_CMD_",	_CMD_TODO_);//КОД ОПЕРАЦИИ КОНВЕРТИРОВАНИЯ НА КОТОРОЙ ЗАКОНЧИЛИ (ДЛЯ ЗАДАНИЯ ЦИКЛА НЕ С НАЧАЛА)
 
+include ('classes' . _SL_ . 'iconvertertransport.php');//ПОДКЛЮЧАЕМ ИНТЕРФЕЙС ТРАНСПОРТА
 include ('classes' . _SL_ . _PARTNER_ . _SL_ . 'transport.php');
 include ('converter.php');

@@ -6,7 +6,7 @@
  * этот класс обеспечивает взаимодействие с файловыми серверами myicloud
  *
  */
-class partnerTransport
+class partnerTransport implements iConverterTransport
 {
 	/**
 	 * храним конфиги подключений ко всем оперируемым БД

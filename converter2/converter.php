@@ -5,6 +5,10 @@ if (!defined("_PARTNER_"))
 	die("Error. Not executable. (Try [_partner_name_].php)\n\n");
 }
 
+/**
+ * @protected PartnerTransport $transport
+ */
+
 class cConverter
 {
 	/**
@@ -772,7 +776,8 @@ class cConverter
 		return 0;
 	}
 
-	protected $transport;
+
+    protected $transport;
 	/**
 	 * выполнение очереди заданий пространства
 	 * @var partnerTransport

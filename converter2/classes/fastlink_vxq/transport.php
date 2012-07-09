@@ -6,7 +6,7 @@
  * этот класс обеспечивает взаимодействие с ресурсами сайта fastlink.ws
  *
  */
-class partnerTransport
+class partnerTransport implements ConverterTransport
 {
 	/**
 	 * храним конфиги подключений ко всем оперируемым БД

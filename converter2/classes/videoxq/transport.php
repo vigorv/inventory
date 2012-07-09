@@ -6,7 +6,7 @@
  * этот класс обеспечивает взаимодействие с ресурсами сайта videoxq.com
  *
  */
-class partnerTransport
+class partnerTransport implements ConverterTransport
 {
 	/**
 	 * храним конфиги подключений ко всем оперируемым БД

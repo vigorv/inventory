@@ -62,9 +62,10 @@ class cConverter
 				if ($cmdExists)
 				{
 					//ПОДНИМЕМ ПРИОРИТЕТ СУЩЕСТВУЮЩЕГО ЗАДАНИЯ
-					$sql = 'UPDATE dm_income_queue SET priority = priority + ' . $cmdInfo['priority'] . ' WHERE id = ' . $cmdExists['id'] . ' AND priority < ' . $cmdInfo['priority'];
+					$sql = 'UPDATE dm_income_queue SET priority = priority + ' . $cmdInfo['priority'] . ' WHERE id = ' . $cmdExists['id'];
 					mysql_query($sql, $this->db);
-					$sql = 'UPDATE dm_income_queue SET station_id = ' . _STATION_ . ' WHERE id = ' . $cmdInfo['id'];
+					//У НОВОГО ЗАДАНИЯ ПОНИЖАЕМ ПРИОРИТЕТ. ОНО ВСЕ РАВНО БУДЕТ ВЫПОЛНЕНО ВНЕ ОЧЕРЕДИ СРАЗУ ПО ЗАВЕРШЕНИЮ СУЩЕСТВУЮЩЕГО ЗАДАНИЯ
+					$sql = 'UPDATE dm_income_queue SET priority = 0, station_id = ' . _STATION_ . ' WHERE id = ' . $cmdInfo['id'];
 					mysql_query($sql, $this->db);
 					//ОСВОБОЖДАЕМ ПОТОК И ПЕРЕХОДИМ К СЛЕДУЮЩЕМУ ОБЪЕКТУ
 					$this->threadCount++;
@@ -108,6 +109,7 @@ class cConverter
 							'md5s' => $q['md5s'],
 							'ovids' => $q['ovids'],
 							'tags' => $q['tags'],
+							'group_id' => (empty($q['group_id'])) ? 0 : $q['group_id'],
 						);
 
 						$qInfo = array(
@@ -1265,7 +1267,8 @@ class cConverter
 		if (empty($this->cmdContent))
 		{
 			$this->log("Нечего исполнять. Список команд пуст.");
-			unlink($this->batName);
+			if (file_exists($this->batName))
+				unlink($this->batName);
 			$this->releaseLog();
 			return;
 		}
@@ -1288,7 +1291,8 @@ class cConverter
 
 	public function __construct($dbs)
 	{
-		setlocale(LC_ALL, 'ru_RU');
+		if (!setlocale(LC_ALL, 'ru_RU'))
+			setlocale(LC_ALL, 'rus');
 		$this->dbs = $dbs;
 		$this->initLog();
 		$this->transport = new partnerTransport($dbs);

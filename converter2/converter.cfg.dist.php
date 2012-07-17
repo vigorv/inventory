@@ -68,7 +68,7 @@ DEFINE("_STATION_",		);	//УНИКАЛЬНЫЙ Номер рабочей ста�
 
 DEFINE("_CATALOGURL_",	"http://media1.itd");
 
-DEFINE("_MYCLOUD_SITE_", "http://myicloud.ws");
+DEFINE("_MYCLOUD_SITE_", "http://safelib.com");
 
 //DEFINE("_ROOT_PATH_",	_SL_ . "home" . _SL_ . "converter" . _SL_ );
 //DEFINE("_CONSOLE_CHARSET_", '866');			//DOS КОДИРОВКА КОНСОЛИ
@@ -78,9 +78,9 @@ DEFINE("_CONSOLE_CHARSET_", 'utf-8');			//UTF8 КОДИРОВКА КОНСОЛИ
 
 DEFINE("_SOURCE_CHARSET_", 'utf-8');			//UTF8 КОДИРОВКА КОНСОЛИ
 
-DEFINE("_SRC_PATH_",	"/mnt/catalog/catalog");	//путь к оригинальным файлам (aka блэйз)
-DEFINE("_SRC2_PATH_",	"/mnt/typhoon/ftp/trash");	//путь к оригинальным файлам (aka тайфун)
-DEFINE("_MEDIA_PATH_",	"/mnt/catalog/x/catalog");	//путь к файлам в медиакаталоге (aka медиа1)
+//DEFINE("_SRC_PATH_",	"/mnt/catalog/catalog");	//путь к оригинальным файлам (aka блэйз)
+//DEFINE("_SRC2_PATH_",	"/mnt/typhoon/ftp/trash");	//путь к оригинальным файлам (aka тайфун)
+//DEFINE("_MEDIA_PATH_",	"/mnt/catalog/x/catalog");	//путь к файлам в медиакаталоге (aka медиа1)
 
 DEFINE("_POSTER_PATH_",	_ROOT_PATH_ . "posters");		//путь к файлам постеров
 DEFINE("_POSTER_SRC_",	"/mnt/media1");		//путь к файлам постеров

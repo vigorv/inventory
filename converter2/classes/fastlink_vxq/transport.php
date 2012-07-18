@@ -282,7 +282,7 @@ $condition = 'f.id = 1524';//ДЛЯ ОТЛАДКИ
 
 		$sql = '
 			SELECT f.id, f.title, f.name AS file_name, f.chk_md5 AS md5, `f`.`group` AS vxq_id FROM fl_catalog AS f
-			WHERE `f`.`group` > 0 AND f.sgroup = 1 AND f.cloud_compressor = 0 ' . $condition . ' ORDER BY f.id ' . $limit . '
+			WHERE `f`.`group` > 0 AND f.sgroup = 1 AND f.cloud_compressor IN (0, ' . _STATION_ . ') ' . $condition . ' ORDER BY f.id ' . $limit . '
 		';
 //				INNER JOIN film_genres ON (film_genres.film_id = f.id)
 //				INNER JOIN genres as g ON (g.id = film_genres.genre_id)

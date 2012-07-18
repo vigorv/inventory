@@ -107,7 +107,7 @@ class cConverter
 					//ВЫЧИТЫВАЕМ С ПАРТНЕРА ЧЕРЕЗ ТРАНСПОРТ ИНФУ О ВСЕХ ВАРИАНТАХ И ЗАКРЕПЛЯЕМ ОБЪЕКТ ЗА СОБОЙ
 					$this->log('получаем через транспорт партнера ' . _PARTNER_ . ' инфу об объекте ' . $cmdInfo['original_id'] . ' очереди ' . $cmdInfo['id']);
 					$queue = $this->transport->getObjectToQueue($cmdInfo['original_id'], $cmdInfo['original_variant_id']);
-var_dump($queue);
+
 					foreach ($queue as $q)
 					{
 						$info = array(

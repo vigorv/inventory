@@ -28,6 +28,8 @@ class cConverter
 		$this->log('выполняется очередь ' . $cmdInfo['id'] . ' действие ' . $cmdInfo['cmd_id'] . ' (состояние ' . $cmdInfo['state'] . ') id объекта=' . $cmdInfo['original_id'] . ' партнера ' . _PARTNER_);
 		if (!$this->initBat($cmdInfo))
 		{
+			$this->log('невозможно создать командный файл ' . $this->batName);
+			//die(iconv(_SOURCE_CHARSET_, _CONSOLE_CHARSET_, 'Error. Невозможно создать командный файл ' . $this->batName));
 			return;
 		}
 		if (!empty($cmdInfo['state']))
@@ -1226,7 +1228,7 @@ class cConverter
 		$f = fopen($this->batName, 'w+'); //создать пустой лог для данной сессии
 		if (!$f)
 		{
-			die(iconv(_SOURCE_CHARSET_, _CONSOLE_CHARSET_, 'Error. Невозможно создать командный файл ' . $this->batName));
+			return false;
 		}
 		fclose($f);
 		$this->cmdContent = '';

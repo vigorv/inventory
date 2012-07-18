@@ -91,7 +91,7 @@ class partnerTransport implements iConverterTransport
 	{
 		$this->errorMsg = '';
 
-		$cfgName = 'fastlink';
+		$cfgName = 'fastlink_vxq';
 		$db = mysql_connect($this->dbs[$cfgName]['host'], $this->dbs[$cfgName]['user'], $this->dbs[$cfgName]['pwd'], true);
 		if (!$db)
 		{
@@ -269,7 +269,7 @@ $condition = 'f.id = 1524';//ДЛЯ ОТЛАДКИ
 			$condition = ' AND ' . $condition;
 		}
 		$queue = array();
-		$cfgName = 'fastlink';
+		$cfgName = 'fastlink_vxq';
 		$this->errorMsg = '';
 		$db = mysql_connect($this->dbs[$cfgName]['host'], $this->dbs[$cfgName]['user'], $this->dbs[$cfgName]['pwd'], true);
 		if (!$db)

@@ -47,6 +47,7 @@ class cConverter
 				return;
 			}
 		}
+
 		if (!empty($info['files']) || ($cmdInfo['cmd_id'] == _CMD_TODO_))
 		{
 			if ($cmdInfo['cmd_id'] == _CMD_TODO_)
@@ -63,8 +64,9 @@ class cConverter
 				mysql_free_result($r);
 				if ($cmdExists)
 				{
+					$this->log('объект уже добавлен в очередь другим пользователем');
 					//ПОДНИМЕМ ПРИОРИТЕТ СУЩЕСТВУЮЩЕГО ЗАДАНИЯ
-					$sql = 'UPDATE dm_income_queue SET priority = priority + ' . $cmdInfo['priority'] . ' WHERE id = ' . $cmdExists['id'];
+					$sql = 'UPDATE dm_income_queue SET priority = priority + ' . $cmdInfo['priority'] . ' + 1 WHERE id = ' . $cmdExists['id'];
 					mysql_query($sql, $this->db);
 					//У НОВОГО ЗАДАНИЯ ПОНИЖАЕМ ПРИОРИТЕТ. ОНО ВСЕ РАВНО БУДЕТ ВЫПОЛНЕНО ВНЕ ОЧЕРЕДИ СРАЗУ ПО ЗАВЕРШЕНИЮ СУЩЕСТВУЮЩЕГО ЗАДАНИЯ
 					$sql = 'UPDATE dm_income_queue SET priority = 0, station_id = ' . _STATION_ . ' WHERE id = ' . $cmdInfo['id'];
@@ -681,7 +683,6 @@ class cConverter
 				break;
 			}
 		}
-//		$this->exec();
 	}
 
 	public function formatPartedFilename($f2, $part)

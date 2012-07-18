@@ -459,7 +459,7 @@ $condition = 'f.id = 1524';//ДЛЯ ОТЛАДКИ
 		$paths = array(
 			_POSTER_PATH_,
 			_COPY_PATH_,
-			_SRC2_PATH_,
+			_OUT_PATH_,
 			_SRC_PATH_
 		);
 		foreach ($paths as $p)

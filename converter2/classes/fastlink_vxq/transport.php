@@ -141,7 +141,7 @@ class partnerTransport implements iConverterTransport
 			);
 			$sql = '
 				INSERT INTO fl_catalog (id,
-					user_id, email, title, original_name, name, comment, group, dt, is_visible, is_confirm,
+					user_id, email, title, original_name, name, comment, `group`, dt, is_visible, is_confirm,
 					dir, sgroup, tp, sz, vtp, chk_md5, cloud_ready, cloud_state, cloud_compressor,
 					preset
 				)

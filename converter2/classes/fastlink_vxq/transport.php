@@ -176,7 +176,7 @@ class partnerTransport implements iConverterTransport
 			';
 			if (!mysql_query($sql, $db))
 			{
-				$this->errorMsg = 'Невозможно обновить данные файла (originalId=' . $variantInfo['id'] . ')';
+				$this->errorMsg = 'Невозможно обновить данные файла (originalId=' . $variantInfo['id'] . ') SQL: ' . $sql;
 				mysql_close($db);
 				return false;
 			}

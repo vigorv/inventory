@@ -168,10 +168,15 @@ class partnerTransport implements iConverterTransport
 		else
 		{
 			//ОБНОВЛЯЕМ СУЩЕСТВУЮЩУЮ ЗАПИСЬ ФАЙЛА
+			$variantInfo['cloud_ready'] = 1;
+			$variantInfo['cloud_state'] = 0;
+			$variantInfo['name'] = mysql_real_escape_string($preset . '/' . basename($newName));
+			$variantInfo['sz'] = $fInfo['size'];
+			$variantInfo['chk_md5'] = $fInfo['md5'];
 			$sql = '
 				UPDATE fl_catalog SET name="' . $variantInfo['name'] . '", sz = ' . $variantInfo['sz'] . ',
 					chk_md5 = "' . $variantInfo['chk_md5'] . '", cloud_ready = ' . $variantInfo['cloud_ready'] . ',
-					' . $variantInfo['cloud_state'] . ', "' . $preset . '"
+					cloud_state = ' . $variantInfo['cloud_state'] . ', preset = "' . $preset . '"
 				WHERE id = ' . $variantInfo['id'] . '
 			';
 			if (!mysql_query($sql, $db))

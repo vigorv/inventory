@@ -140,7 +140,7 @@ class partnerTransport implements iConverterTransport
 				'preset'		=> $preset,
 			);
 			$sql = '
-				INSERT INTO fl_catalog (id
+				INSERT INTO fl_catalog (id,
 					user_id, email, title, original_name, name, comment, group, dt, is_visible, is_confirm,
 					dir, sgroup, tp, sz, vtp, chk_md5, cloud_ready, cloud_state, cloud_compressor,
 					preset
@@ -160,7 +160,7 @@ class partnerTransport implements iConverterTransport
 			}
 			else
 			{
-				$this->errorMsg = 'Невозможно создать новый вариант файла';
+				$this->errorMsg = 'Невозможно создать новый вариант файла. SQL: ' . $sql;
 				mysql_close($db);
 				return false;
 			}

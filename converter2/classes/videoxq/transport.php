@@ -434,6 +434,7 @@ class partnerTransport implements iConverterTransport
 				"description"		=> $r['description'],
 				"year"				=> $r['year'],
 			);
+
 			$queue[$r['id']] = array(
 				'original_id' => $r['id'],
 				'just_online' => $r['just_online'],
@@ -442,6 +443,10 @@ class partnerTransport implements iConverterTransport
 				'ovids' => $ovids,
 				'tags' => $tags,
 			);
+			if (count($files) > 1)
+			{
+				$queue[$r['id']]['group_id'] = $r['id'];
+			}
 		}
 		mysql_free_result($q);
 

@@ -263,7 +263,7 @@ class partnerTransport implements iConverterTransport
 	 */
 	public function createQueue($condition = '')
 	{
-$condition = 'f.id = 1524';//ДЛЯ ОТЛАДКИ
+//$condition = 'f.id = 1524';//ДЛЯ ОТЛАДКИ
 		if (empty($condition))
 		{
 			$limit = 'LIMIT ' . _QUEUE_LIMIT_;

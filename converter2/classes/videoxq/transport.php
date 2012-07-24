@@ -397,7 +397,7 @@ class partnerTransport implements iConverterTransport
 			SELECT f.id, f.title, f.title_en, f.dir, f.description, f.year, f.just_online, fv.id AS ovid, ff.file_name, ff.id AS ffid, ff.md5 FROM films AS f
 				INNER JOIN film_variants as fv ON (fv.film_id = f.id)
 				INNER JOIN film_files AS ff ON (ff.film_variant_id = fv.id)
-			WHERE f.is_license=1 AND f.active > 0 AND ff.cloud_compressor IN (0, ' . _STATION_ . ') ' . $condition . ' ORDER BY f.id ' . $limit . '
+			WHERE f.is_license=1 AND f.active > 0 AND ff.cloud_ready=0 AND ff.cloud_state=0 AND ff.cloud_compressor IN (0, ' . _STATION_ . ') ' . $condition . ' ORDER BY f.id ' . $limit . '
 		';
 //				INNER JOIN film_genres ON (film_genres.film_id = f.id)
 //				INNER JOIN genres as g ON (g.id = film_genres.genre_id)
@@ -407,7 +407,7 @@ class partnerTransport implements iConverterTransport
 		{
 			if (strpos($r['file_name'], '270/') !== false)//ВЕРСИЮ ДЛЯ МОБИЛЬНЫХ ГЕНЕРИМ ПО НОВОЙ
 			{
-				$sql = 'UPDATE film_files SET cloud_compressor = ' . _STATION_ . ', cloud_state = 1 WHERE id = ' . $r['ffid'];
+				$sql = 'UPDATE film_files SET cloud_compressor = ' . _STATION_ . ', cloud_state = ' . _CLOUD_STATE_SPIRIT_ . ' WHERE id = ' . $r['ffid'];
 				mysql_query($sql, $db);
 				continue;
 			}
@@ -425,7 +425,7 @@ class partnerTransport implements iConverterTransport
 			$files[] = "/" . $letter . "/" . $r['dir'] . "/" . $r['file_name'];
 			$md5s[] = $r['md5'];
 			$ovids[] = $r['ovid'];
-			$sql = 'UPDATE film_files SET cloud_compressor = ' . _STATION_ . ' WHERE id = ' . $r['ffid'];
+			$sql = 'UPDATE film_files SET cloud_compressor = ' . _STATION_ . ', cloud_state = ' . _CLOUD_STATE_BUSY_ . ' WHERE id = ' . $r['ffid'];
 			mysql_query($sql, $db);
 
 			$tags = array(

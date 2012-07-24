@@ -884,7 +884,7 @@ class cConverter
 			}
 			else
 			{
-				$this->log('невозможно подключиться к БД партнера ' . _PARTNER_);
+				$this->log('транспорт партнера ' . _PARTNER_ . ' вернул ошибку. ' .$this->transport->errorMsg);
 			}
 		}
 	}

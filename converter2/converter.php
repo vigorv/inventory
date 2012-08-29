@@ -626,6 +626,14 @@ class cConverter
 										$this->threadCount++;
 										return;
 									}
+									$this->transport->updateMedia1($cmdInfo['original_id'], basename($f), $f2, $preset, $fInfo);
+									if (!empty($this->transport->errorMsg))
+									{
+										$this->setQueueState($cmdInfo, _STATE_ERR_);
+										$this->log($this->transport->errorMsg);
+										$this->threadCount++;
+										return;
+									}
 								}
 								$this->transport->dropOriginal($cmdInfo['original_id']);
 							}
@@ -680,6 +688,77 @@ class cConverter
 					//ДОБАВЛЕНИЕ В ВИТРИНЫ И В ПП ПОЛЬЗОВАТЕЛЕЙ, ОЖИДАЮЩИХ ОЧЕРЕДИ НА ЭТОТ ПРОДУКТ
 					$cmd = 'wget ' . _MYCLOUD_SITE_ . '/products/addfromqueue/' . $cmdInfo['id'];
 					exec($cmd);
+					$this->setQueueState($cmdInfo, _STATE_WAIT_);
+					$this->setQueueCmd($cmdInfo, _CMD_DONE_);
+					$this->threadCount++;
+				break;
+
+				case _CMD_MEDIA1_:
+					//ОТДЕЛЬНОЕ ДЕЙСТВИЕ НА ОБНОВЛЕНИЕ ДАННЫХ В БД MEDIA1
+
+					$checkConn = $this->transport->checkConnections();
+					if ($checkConn)
+					{
+						$this->threadCount++;
+						$this->log($checkConn);
+						break;
+					}
+
+				if (defined("_MEDIA_PATH_"))
+					switch ($cmdInfo['state'])
+					{
+						case _STATE_WAIT_:
+							$this->setQueueState($cmdInfo, _STATE_PROCESS_);
+							for ($i = 0; $i < count($info['files']); $i++)
+							{
+								$f = $info['files'][$i];
+								$fInfo = pathinfo($f);
+								$path = $fInfo['dirname'];//ДОЛЖЕН НАЧИНАТЬСЯ СО СЛЭША И БУКВЫ АЛФАВИТА
+								$f2 = basename($info['newfiles'][$i]);
+
+								$presets = $this->getPresetList($f);
+
+								foreach ($presets as $preset)
+								{
+									$p2 = _SL_ . $preset . $path;
+									$fullName = _MEDIA_PATH_ . $path . _SL_ . $preset . _SL_ . $f2;
+									if (!file_exists($fullName))
+									{
+										$this->setQueueState($cmdInfo, _STATE_ERR_);
+										$this->log('не найден файл в хранилище MEDIA1 ' . $fullName);
+										$this->threadCount++;
+										return;
+									}
+
+									$fSize = filesize($fullName);
+									$fMd5 = md5_file($fullName);
+
+									$height = array();
+									exec('mediainfo --Inform="Video;%Height%" ' . $fullName, $height);
+									$width = array();
+									exec('mediainfo --Inform="Video;%Width%" ' . $fullName, $width);
+									$resolution = '';
+									if (!empty($height[0]) && !empty($width[0]))
+									{
+										$resolution = $width[0] . 'x' . $height[0];
+									}
+									$fInfo = array('size' => $fSize, 'md5' => $fMd5, 'path' => $path, 'resolution' => $resolution);
+									$this->transport->updateMedia1($cmdInfo['original_id'], basename($f), $f2, $preset, $fInfo);
+									if (!empty($this->transport->errorMsg))
+									{
+										$this->setQueueState($cmdInfo, _STATE_ERR_);
+										$this->log($this->transport->errorMsg);
+										$this->threadCount++;
+										return;
+									}
+								}
+							}
+							//УДАЛЯЕМ СТАРЫЙ КОНТЕНТ НА КОМПРЕССОРЕ И У ПАРТНЕРА
+							/**
+							 * ! к реализации
+							 */
+
+						}
 					$this->setQueueState($cmdInfo, _STATE_WAIT_);
 					$this->setQueueCmd($cmdInfo, _CMD_DONE_);
 					$this->threadCount++;
@@ -1110,7 +1189,7 @@ class cConverter
 	 *
 	 * @var string
 	 */
-	protected $logFileName = 'current.log';
+	protected $logFileName = '';
 
 	/**
 	 * коннект к БД (handle)
@@ -1173,6 +1252,9 @@ class cConverter
 		$this->createTree(_CMD_PATH_);
 		$this->createTree(_TMP_PATH_);
 		$this->createTree(_POSTER_PATH_);
+
+		if (empty($this->logFileName))
+			$this->logFileName = 'current.' . _PARTNER_ . '.log';
 
 		$current = _LOG_PATH_ . _SL_ . $this->logFileName;
 		if (file_exists($current))

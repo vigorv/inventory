@@ -94,4 +94,15 @@ interface iConverterTransport
 	 * @param mixed $info
 	 */
 	public function clearCache($info);
+
+	/**
+	 * вызов действия обновления инфо сконвертированного объекта в БД media1
+	 *
+	 * @param integer $originalId
+	 * @param string $oldName
+	 * @param string $newName
+	 * @param string $preset
+	 * @param mixed $fInfo - инфо  нового файла (размер в байтах, md5-хэш итд
+	 */
+	public function updateMedia1($originalId, $oldName, $newName, $preset, $fInfo);
 }

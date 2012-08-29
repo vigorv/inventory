@@ -533,4 +533,54 @@ class partnerTransport implements iConverterTransport
 			file_get_contents('http://videoxq.com/media/clearcache/' . $info['original_id']);
 		}
 	}
+
+	/**
+	 * вызов действия обновления инфо сконвертированного объекта в БД media1
+	 *
+	 * @param integer $originalId
+	 * @param string $oldName
+	 * @param string $newName
+	 * @param string $preset
+	 * @param mixed $fInfo - инфо  нового файла (размер в байтах, md5-хэш итд
+	 */
+	public function updateMedia1($originalId, $oldName, $newName, $preset, $fInfo)
+	{
+		$cfgName = 'media1';
+		if (!empty($this->dbs[$cfgName]))
+		{
+			$db = mysql_connect($this->dbs[$cfgName]['host'], $this->dbs[$cfgName]['user'], $this->dbs[$cfgName]['pwd'], true);
+			if (!$db)
+			{
+				$this->errorMsg = 'Невозможно соединиться с БД ' . $this->dbs[$cfgName]['host'] . '@' . $this->dbs[$cfgName]['user'];
+				return false;
+			}
+			mysql_select_db($this->dbs[$cfgName]['name'], $db);
+			mysql_query('SET NAMES ' . $this->dbs[$cfgName]['locale'], $db);
+
+			//УДАЛЯЕМ ФАЙЛ
+			$sql = 'DELETE FROM files WHERE FilmID = ' . $originalId . ' AND Name LIKE "%' . $oldName . '")';
+			$q = mysql_query($sql, $db);
+
+			//ДОБАВЛЯЕМ ФАЙЛ В МЕДИАКАТАЛОГ
+			$fileInfo = array(
+				'Marked'	=> 0,
+				'FilmID'	=> $originalId,
+				'Name'		=> basename($newName),
+				'MD5'		=> $fInfo['md5'],
+				'Path'		=> _MEDIA_PATH_ . $fInfo['path'] . '/' . $preset . '/' . basename($newName),
+				'Size'		=> $fInfo['size'],
+				'ed2kLink'	=> '',
+				'dcppLink'	=> '',
+				'dateadd'	=> time(),
+				'isfilecheked'	=> 1,
+				'tomoveback'	=> 0,
+				'backpath'	=> '',
+			);
+			$sql = 'INSERT INTO files (ID, Marked, FilmID, Name, MD5, Path, Size, ed2kLink, dcppLink, dateadd, isfilecheked, tomoveback, backpath)
+			VALUES (NULL, ' . $fileInfo['Marked'] . ', ' . $fileInfo['FilmID'] . ', "' . $fileInfo['Name'] . '", "' . $fileInfo['MD5'] . '", "' . $fileInfo['Path'] . '", ' . $fileInfo['Size'] . ', "' . $fileInfo['ed2kLink'] . '", "' . $fileInfo['dcppLink'] . '", "' . $fileInfo['dateadd'] . '", ' . $fileInfo['isfilecheked'] . ', ' . $fileInfo['tomoveback'] . ', "' . $fileInfo['backpath'] . '")
+			';
+			$q = mysql_query($sql, $db);
+			mysql_close($db);
+		}
+	}
 }

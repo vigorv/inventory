@@ -382,4 +382,8 @@ class partnerTransport implements iConverterTransport
 	public function clearCache($info)
 	{
 	}
+
+	public function updateMedia1($originalId, $oldName, $newName, $preset, $fInfo)
+	{
+	}
 }

@@ -52,34 +52,38 @@ class cConverter
 		{
 			if ($cmdInfo['cmd_id'] == _CMD_TODO_)
 			{
-				//ОБЪЕКТ ПОСТАВЛЕН В ОЧЕРЕДЬ С САЙТА
-				//ПРОВЕРЯЕМ ЕСТЬ ЛИ ОН УЖЕ В ОЧЕРЕДИ ОТ ДРУГОГО ПОЛЬЗОВАТЕЛЯ И ЗАПУЩЕН
-				$sql = 'SELECT id FROM dm_income_queue WHERE
-					id <> ' . $cmdInfo['id'] . ' AND original_id = ' . $cmdInfo['original_id'] . '
-					AND partner_id = ' . _PARTNER_ID_ . ' AND cmd_id > ' . _CMD_TODO_ . '	LIMIT 1
-				';
-				$this->db = $this->connectDb("mycloud", $this->db);
-				$r = mysql_query($sql, $this->db);
-				$cmdExists = mysql_fetch_assoc($r);
-				mysql_free_result($r);
-				if ($cmdExists)
+				if (_PARTNER_ID_ > 0) //-1 ДЛЯ СОБСТВЕННЫХ ВИТРИН; 0 - ДЛЯ ФАЙЛОВ ПОЛЬЗОВАТЕЛЕЙ
 				{
-					$this->log('объект уже добавлен в очередь другим пользователем');
-					//ПОДНИМЕМ ПРИОРИТЕТ СУЩЕСТВУЮЩЕГО ЗАДАНИЯ
-					$sql = 'UPDATE dm_income_queue SET priority = priority + ' . $cmdInfo['priority'] . ' + 1 WHERE id = ' . $cmdExists['id'];
-					mysql_query($sql, $this->db);
-					//У НОВОГО ЗАДАНИЯ ПОНИЖАЕМ ПРИОРИТЕТ. ОНО ВСЕ РАВНО БУДЕТ ВЫПОЛНЕНО ВНЕ ОЧЕРЕДИ СРАЗУ ПО ЗАВЕРШЕНИЮ СУЩЕСТВУЮЩЕГО ЗАДАНИЯ
-					$sql = 'UPDATE dm_income_queue SET priority = 0, station_id = ' . _STATION_ . ' WHERE id = ' . $cmdInfo['id'];
-					mysql_query($sql, $this->db);
-					//ОСВОБОЖДАЕМ ПОТОК И ПЕРЕХОДИМ К СЛЕДУЮЩЕМУ ОБЪЕКТУ
-					$this->threadCount++;
-					return;
+					//ОБЪЕКТ ПОСТАВЛЕН В ОЧЕРЕДЬ С САЙТА ПАРТНЕРА
+					//ПРОВЕРЯЕМ ЕСТЬ ЛИ ОН УЖЕ В ОЧЕРЕДИ ОТ ДРУГОГО ПОЛЬЗОВАТЕЛЯ И ЗАПУЩЕН
+					$sql = 'SELECT id FROM dm_income_queue WHERE
+						id <> ' . $cmdInfo['id'] . ' AND original_id = ' . $cmdInfo['original_id'] . '
+						AND partner_id = ' . _PARTNER_ID_ . ' AND cmd_id > ' . _CMD_TODO_ . '	LIMIT 1
+					';
+					$this->db = $this->connectDb("mycloud", $this->db);
+					$r = mysql_query($sql, $this->db);
+					$cmdExists = mysql_fetch_assoc($r);
+					mysql_free_result($r);
+					if ($cmdExists)
+					{
+						$this->log('объект уже добавлен в очередь другим пользователем');
+						//ПОДНИМЕМ ПРИОРИТЕТ СУЩЕСТВУЮЩЕГО ЗАДАНИЯ
+						$sql = 'UPDATE dm_income_queue SET priority = priority + ' . $cmdInfo['priority'] . ' + 1 WHERE id = ' . $cmdExists['id'];
+						mysql_query($sql, $this->db);
+						//У НОВОГО ЗАДАНИЯ ПОНИЖАЕМ ПРИОРИТЕТ. ОНО ВСЕ РАВНО БУДЕТ ВЫПОЛНЕНО ВНЕ ОЧЕРЕДИ СРАЗУ ПО ЗАВЕРШЕНИЮ СУЩЕСТВУЮЩЕГО ЗАДАНИЯ
+						$sql = 'UPDATE dm_income_queue SET priority = 0, station_id = ' . _STATION_ . ' WHERE id = ' . $cmdInfo['id'];
+						mysql_query($sql, $this->db);
+						//ОСВОБОЖДАЕМ ПОТОК И ПЕРЕХОДИМ К СЛЕДУЮЩЕМУ ОБЪЕКТУ
+						$this->threadCount++;
+						return;
+					}
 				}
 
 				//ПРОВЕРЯЕМ ЕСТЬ ЛИ ОН УЖЕ В ВИТРИНАХ ПАРТНЕРА
 				//КОНТЕНТ ФАЙЛОВЫХ СЕРВЕРОВ ОБЛАКА ОБРАБАТЫВАЕТСЯ ПОД partner_id = 0
+				//КОНТЕНТ ВИТРИН ОБЛАКА ОБРАБАТЫВАЕТСЯ ПОД partner_id = -1
 				$productExists = array();
-				if (!empty($cmdInfo['partner_id']))
+				if (($cmdInfo['partner_id']) > 0)
 				{
 					if ($cmdInfo['original_variant_id'] > 0)
 						$sql = 'SELECT p.id FROM dm_products AS p INNER JOIN dm_product_variants AS pv ON (pv.product_id = p.id)
@@ -1259,8 +1263,22 @@ class cConverter
 		$current = _LOG_PATH_ . _SL_ . $this->logFileName;
 		if (file_exists($current))
 		{
-			die(iconv(_SOURCE_CHARSET_, _CONSOLE_CHARSET_, 'Скрипт уже запущен или принудительно завершен. подробнее см. лог-файл ' . $current));
-			return;
+			//ЖДЕМ НЕКОТОРЕ ВРЕМЯ, ПОТОМ ПЕРЕИМЕНОВЫВАЕМ ЗАВИСШИЙ ЛОГ
+			$curTime = time();
+			clearstatcache();
+			$fileTime = filemtime($current);
+			if ($fileTime && ($curTime - $fileTime > 3600 * 3))//ТРИ ЧАСА
+			{
+				$restartName = 'current.' . _PARTNER_ . '.restart.' . date('Y-m-d_H-i-s') . '.log';
+				rename($current, _LOG_PATH_ . _SL_ . $restartName);
+				die(iconv(_SOURCE_CHARSET_, _CONSOLE_CHARSET_, 'Перезапускаем после простоя. подробнее см. лог-файл ' . $restartName));
+				return;
+			}
+			else
+			{
+				die(iconv(_SOURCE_CHARSET_, _CONSOLE_CHARSET_, 'Скрипт уже запущен или принудительно завершен. подробнее см. лог-файл ' . $current));
+				return;
+			}
 		}
 
 		$f = fopen($current, 'w+'); //создать пустой лог для данной сессии

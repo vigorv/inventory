@@ -1316,6 +1316,7 @@ class cConverter
 			if ($cmdInfo['state'] && filesize($this->batName))
 			{
 				//НЕ ПЕРЕСОХДАЕМ КОМАНДНЫЙ ФАЙЛ, ЕСЛИ ОПЕРАЦИЯ СТАРТОВАЛА
+				$this->batName = '';
 				return false;
 			}
 		}
@@ -1332,6 +1333,7 @@ class cConverter
 		$f = fopen($this->batName, 'w+'); //создать пустой лог для данной сессии
 		if (!$f)
 		{
+			$this->batName = '';
 			return false;
 		}
 		fclose($f);
@@ -1373,7 +1375,7 @@ class cConverter
 		if (empty($this->cmdContent))
 		{
 			$this->log("Нечего исполнять. Список команд пуст.");
-			if (file_exists($this->batName))
+			if (!empty($this->batName) && file_exists($this->batName))
 				unlink($this->batName);
 			$this->releaseLog();
 			return;

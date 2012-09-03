@@ -183,7 +183,7 @@ class partnerTransport implements iConverterTransport
 		}
 
 		//ПРОВЕРЯЕМ НАЛИЧИЕ В БАЗЕ ЗАПИСИ О ФАЙЛЕ
-		$sql = 'SELECT * FROM dm_variant_files WHERE variant_quality_id = ' . $qualityExists['id'] . ' AND preset_id = ' . $qualityInfo['id'];
+		$sql = 'SELECT * FROM dm_product_files WHERE variant_quality_id = ' . $qualityExists['id'] . ' AND preset_id = ' . $qualityInfo['id'];
 		$q = mysql_query($sql, $db);
 		$fileExists = mysql_fetch_assoc($q);
 		mysql_free_result($q);

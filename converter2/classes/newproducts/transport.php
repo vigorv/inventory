@@ -105,55 +105,108 @@ class partnerTransport implements iConverterTransport
 		else
 			$qualityInfo = $presets[$preset];
 
-		//ВЫБИРАЕМ ИНФОРМАЦИЮ О НЕТИПИЗИРОВАННОМ ФАЙЛЕ
-		$sql = '
-			SELECT fv.id, fl.server_id, fl.state, fl.folder FROM dm_files_variants fv
-				INNER JOIN dm_filelocations AS fl ON (fl.id = fv.id)
-				WHERE fv.file_id = ' . $originalId . ' AND fv.preset_id=0 LIMIT 1
-		';
+		//ВЫБИРАЕМ ИНФОРМАЦИЮ ОБ ИСПОЛНЯЕМОЙ ОЧЕРЕДИ (для получения group_id)
+		$sql = 'SELECT * FROM dm_income_queue WHERE original_id = ' . $originalId . ' AND cmd_id = ' . _CMD_SAVEBACK_ . ' AND partner_id = ' . _PARTNER_ID_;
 		$q = mysql_query($sql, $db);
-		$oldFileInfo = mysql_fetch_assoc($q);
+		$queueInfo = mysql_fetch_assoc($q);
+		$info = unserialize($queueInfo['info']);
 		mysql_free_result($q);
 
-		//ЗНАЧИТ НУЖНО СОЗДАТЬ ВАРИАНТ ДЛЯ ДАННОГО КАЧЕСТВА
-		$variantInfo = array(
-			'file_id'		=> $originalId,
-			'preset_id'		=> $qualityInfo['id'],
-			'fsize'			=> $fInfo['size'],
-			'fmd5'			=> $fInfo['md5'],
-		);
-		$sql = '
-			INSERT INTO dm_files_variants (id, file_id, preset_id, fsize, fmd5)
-			VALUES (null, ' . $variantInfo['file_id'] . ', ' . $variantInfo['preset_id']
-		. ', ' . $variantInfo['fsize'] . ', "' . $variantInfo['fmd5'] . '"'
-		. ')';
-		if (mysql_query($sql, $db))
+		//ВЫБИРАЕМ ОРИГИНАЛЬНЫЙ ВАРИАНТ
+		$sql = 'SELECT * FROM dm_product_variants WHERE id = ' . $originalId;
+		$q = mysql_query($sql, $db);
+		$variantInfo = mysql_fetch_assoc($q);
+		mysql_free_result($q);
+
+		if (($variantInfo['childs'] == ',,') && !empty($info['group_id']))
 		{
-			$variantInfo['id'] = mysql_insert_id($db);
+			//НАДО ДОБАВИТЬ ПРЕДКА
+			//ИЩЕМ ПРЕДКА С ТАКИМ group_id
+			$sql = 'SELECT * FROM dm_product_variants WHERE original_id = ' . $info['group_id'] . ' AND product_id = ' . $variantInfo['product_id'];
+			$q = mysql_query($sql, $db);
+			$parentExists = mysql_fetch_assoc($q);
+			mysql_free_result($q);
+
+			if (!empty($parentExists))
+			{
+				//ДОБАВЛЯЕМ ПРЕДКУ ЭТОГО ПОТОМКА
+				$childs = $this->getChildsIds($parentExists['childs']);
+				$childs[$variantInfo['id']] = $variantInfo['id'];
+				$parentExists['childs'] = ',' . implode(',', $childs) . ',';
+				$sql = 'UPDATE dm_product_variants SET childs = "' . $childs . '" WHERE id = ' . $parentExists['id'];
+				mysql_query($sql, $db);
+			}
+			else
+			{
+				//СОЗДАЕМ ПРЕДКА
+				$parentExists = $variantInfo;
+				$parentExists['childs'] = ',' . $variantInfo['id'] . ',';
+				$parentExists['original_id'] = $info['group_id'];
+				$sql = 'INSERT INTO dm_product_variants (id, product_id, online_only, type_id, active,
+					title, description, original_id, childs, sub_id, cloud_ready, cloud_state, cloud_compressor)
+				VALUES (NULL, ' . $parentExists['product_id'] . ', ' . $parentExists['online_only'] . ', ' .
+				$parentExists['type_id'] . ', 0, "", "", ' . $parentExists['original_id'] . ', "' .
+				$parentExists['childs'] . '", ' . $parentExists['sub_id'] . ', 1, 0, 0)';
+
+				mysql_query($sql, $db);
+			}
+
+			//ОБНОВЛЯЕМ ПОТОМКА (ВАРИАНТ ГОТОВ)
+			$sql = 'UPDATE dm_product_variants SET childs = "", active=0, cloud_ready=1 WHERE id = ' . $variantInfo['id'];
+			mysql_query($sql, $db);
 		}
 		else
 		{
-			$this->errorMsg = 'Невозможно создать новый вариант файла';
-			mysql_close($db);
-			return false;
-		}
-
-		if ($oldFileInfo)
-		{
-			//ТЕПЕРЬ ДОБАВЛЯЕМ НОВУЮ ЛОКАЦИЮ
-			$fileInfo = array(
-				'id' => $variantInfo['id'],
-				'server_id' => $oldFileInfo['server_id'], //$preset . '/' . basename($newName),
-				'state'		=> $oldFileInfo['state'],
-				'folder'	=> $oldFileInfo['folder'] . '/' . $preset . '/',
-				'fsize'		=> $fInfo['size'],
-				'fname'		=> basename($newName),
-			);
-			$sql = 'INSERT INTO dm_filelocations (id, server_id, state, fsize, fname, folder)
-			VALUES (' . $fileInfo['id'] . ', ' . $fileInfo['server_id'] . ', ' . $fileInfo['state'] . ', '
-			. $fileInfo['fsize'] . ', "' . $fileInfo['fname'] . '", "' . $fileInfo['folder'] . '")';
+			//ВАРИАНТ ГОТОВ
+			$sql = 'UPDATE dm_product_variants SET active=0, cloud_ready=1 WHERE id = ' . $variantInfo['id'];
 			mysql_query($sql, $db);
 		}
+
+		//ПРОВЕРЯЕМ НАЛИЧИЕ В БАЗЕ ЗАПИСИ О ДАННОМ КАЧЕСТВЕ ДЛЯ ЭТОГО ВАРИАНТА
+		$sql = 'SELECT * FROM dm_variant_qualities WHERE variant_id = ' . $variantInfo['id'] . ' AND preset_id = ' . $qualityInfo['id'];
+		$q = mysql_query($sql, $db);
+		$qualityExists = mysql_fetch_assoc($q);
+		mysql_free_result($q);
+
+		if (empty($qualityExists))
+		{
+			//ДОБАВЛЯЕМ СВЯЗЬ С КАЧЕСТВОМ
+			$qualityExists = array(
+				'variant_id' => $variantInfo['id'],
+				'preset_id' => $qualityInfo['id'],
+			);
+			$sql = 'INSERT INTO dm_variant_qualities (id, variant_id, preset_id)
+				VALUES (NULL, ' . $qualityExists['variant_id'] . ', ' . $qualityExists['preset_id'] . ')
+			';
+			mysql_query($sql, $db);
+			$qualityExists['id'] = mysql_insert_id($db);
+		}
+
+		//ПРОВЕРЯЕМ НАЛИЧИЕ В БАЗЕ ЗАПИСИ О ФАЙЛЕ
+		$sql = 'SELECT * FROM dm_variant_files WHERE variant_quality_id = ' . $qualityExists['id'] . ' AND preset_id = ' . $qualityInfo['id'];
+		$q = mysql_query($sql, $db);
+		$fileExists = mysql_fetch_assoc($q);
+		mysql_free_result($q);
+
+		if (empty($fileExists))
+		{
+			//ДОБАВЛЯЕМ ФАЙЛ
+			$fileExists = array(
+				'size' => $fInfo['size'],
+				'md5' => $fInfo['md5'],
+				'fname' => $fInfo['path'] . '/' . $preset . '/' . basename($newName),
+				'preset_id' => $qualityInfo['id'],
+				'variant_quality_id' => $qualityExists['id'],
+			);
+
+			$sql = 'INSERT INTO dm_product_files (id, `size`, md5, fname, preset_id, variant_quality_id)
+				VALUES (NULL, ' . $fileExists['size'] . ', ' . $fileExists['md5'] . ', "' . $fileExists['fname'] . '", ' .
+				$fileExists['preset_id'] . ', ' . $fileExists['variant_quality_id'] . ')
+			';
+			mysql_query($sql, $db);
+		}
+//ВРОДЕ БЫ ГОТОВО К ОТЛАДКЕ НА КОМПРЕССОРЕ
+
 		mysql_close($db);
 	}
 
@@ -200,7 +253,6 @@ class partnerTransport implements iConverterTransport
 		$queue = array();
 		if (empty($condition))
 		{
-			return $queue;
 			$limit = 'LIMIT ' . _QUEUE_LIMIT_;
 		}
 		else
@@ -222,9 +274,9 @@ class partnerTransport implements iConverterTransport
 		//ВЫЧИТЫВАЕМ ИНФО О ПРОДУКТЕ И ВАРИАНТАХ НЕГОТОВЫХ ДЛЯ ОБЛАКА
 		//СНАЧАЛА ПОЛУЧАЕМ СПИСОК ВСЕХ ВАРИАНТОВ
 		$sql = '
-			SELECT pv.product_id, p.title, pv.title as pvtitle, p.description, pv.description as pvdescription, pv.id FROM dm_product_variants AS pv
+			SELECT pv.product_id, pv.online_only, p.title, pv.title as pvtitle, pv.description as pvdescription, pv.id FROM dm_product_variants AS pv
 				INNER JOIN dm_products as p ON (pv.product_id = p.id)
-				WHERE pv.cloud_ready = 0 AND pvl.param_id = 4 ' . $condition . ' ORDER BY pv.id
+				WHERE pv.cloud_ready = 0 ' . $condition . ' ORDER BY pv.id
 		';
 		$q = mysql_query($sql, $db);
 		$variants = array();
@@ -233,22 +285,60 @@ class partnerTransport implements iConverterTransport
 			$variants[$r['id']] = $r;
 		}
 		mysql_free_result($q);
+
 		if (empty($variants))
+		{
+			mysql_close($db);
 			return $queue;
+		}
 
 		//ПОЛУЧАЕМ ПАРАМЕТРЫ ВСЕХ ВАРИАНТОВ ДЛЯ ФОРМИРОВАНИЯ ТЭГОВ
-		$inSql = ' AND variant_id IN (' . implode(',', array_keys($variants)) . ')';
+		$inSql = ' AND pvl.variant_id IN (' . implode(',', array_keys($variants)) . ')';
 		$sql = '
 			SELECT pvl.variant_id, pvl.param_id, pvl.value FROM dm_product_param_values
 				AS pvl WHERE pvl.value <> ""' . $inSql;
 
+		$q = mysql_query($sql, $db);
 		while ($r = mysql_fetch_assoc($q))
 		{
+			$pName = '';
+			switch ($r['param_id'])
+			{
+				case 4://ОТНОСИТЕЛЬНЫЙ ПУТЬ К ФАЙЛУ В ШАРЕ ВХОДЯЩЕГО КОНТЕНТА
+					$pName = 'fname';
+				break;
+				case 12://
+					$pName = 'title_original';
+				break;
+				case 10://
+					$pName = 'poster';
+				break;
+				case 13://
+					$pName = 'year';
+				break;
+				case 14://
+					$pName = 'country';
+				break;
+				case 15://
+					$pName = 'director';
+				break;
+				case 18://
+					$pName = 'genres';
+				break;
+				case 11://
+					$pName = 'usertitle';
+				break;
+				case 11://
+					$pName = 'userdescription';
+				break;
+			}
+			if (!empty($pName))
+				$variants[$r['variant_id']][$pName] = $r['value'];
 		}
 		mysql_free_result($q);
 
 		//СОЗДАЕМ ОЧЕРЕДЬ ДЛЯ КАЖДОГО ФАЙЛА (ТЭГИ БЕРЕМ ИЗ ПАРАМЕТРОВ, ВЫСТАВЛЯЕМ ГРУППИРОВКУ, ЕСЛИ НЕСКОЛЬКО ФАЙЛОВ В ДОБАВЛЕННОМ ПРОДУКТЕ)
-		while ($r = mysql_fetch_assoc($q))
+		foreach ($variants as $r)
 		{
 			if (empty($queue[$r['id']]))
 			{
@@ -257,37 +347,42 @@ class partnerTransport implements iConverterTransport
 				$ovids = array();
 			}
 
-			$files[] = "/" . $r['folder'] . "/" . $r['fname'];
-			$md5s[] = $r['fmd5'];
+			$files[] = $r['fname'];
+			$md5s[] = '';
+
+			if (!empty($r['pvtitle'])) $r['title'] = $r['pvtitle'];
+			if (!empty($r['usertitle'])) $r['title'] = $r['usertitle'];
+
+			$r['description'] = '';
+			if (!empty($r['pvdescription'])) $r['description'] = $r['pvdescription'];
+			if (!empty($r['userdescription'])) $r['description'] = $r['userdescription'];
+
+			if (empty($r['title_original'])) $r['title_original'] = $r['title'];
+			if (empty($r['year'])) $r['year'] = 0;
+			if (empty($r['poster'])) $r['poster'] = '';
+			if (empty($r['country'])) $r['country'] = '';
+			if (empty($r['director'])) $r['director'] = '';
 
 			$tags = array(
 				"title"				=> $r['title'],
-				"title_original"	=> $r['title'],
-//ДОПИСАТЬ ВЫБОРКУ ИЗ ПАРАМЕТРОВ user_objects
-				"description"		=> "",
-//ДОПИСАТЬ ВЫБОРКУ ИЗ ПАРАМЕТРОВ user_objects
-				"year"				=> 0,
+				"title_original"	=> $r['title_original'],
+				"description"		=> $r['description'],
+				"year"				=> $r['year'],
+				"poster"			=> $r['poster'],
+				"country"			=> $r['country'],
+				"director"			=> $r['director'],
 			);
 			$queue[$r['id']] = array(
 				'original_id' => $r['id'],
-				'just_online' => 0,
+				'group_id' => $r['product_id'],
+				'just_online' => $r['online_only'],
 				'files' => $files,
 				'md5s' => $md5s,
 				'ovids' => $ovids,
 				'tags' => $tags,
 			);
 		}
-		mysql_free_result($q);
 
-		if (!empty($queue))
-		{
-			foreach ($queue as $k => $q)
-			{
-		//ОПРЕДЕЛЯЕМ СПИСОК ЖАНРОВ
-		//ОПРЕДЕЛЯЕМ СПИСОК СТРАН
-		//ОПРЕДЕЛЯЕМ ПОСТЕР
-			}
-		}
 		mysql_close($db);
 		return $queue;
 	}
@@ -376,4 +471,25 @@ class partnerTransport implements iConverterTransport
 	public function updateMedia1($originalId, $oldName, $newName, $preset, $fInfo)
 	{
 	}
+
+    /**
+     * преобразовать значение строкового поля childs варианта в массив идентификаторов
+     *
+     * @param string $childs
+     * @return mixed
+     */
+    public static function getChildsIds($childs)
+    {
+		$childs = explode(',', $childs);
+		$ids = array();
+		foreach ($childs as $v)
+		{
+			$v = intval($v);
+			if (!empty($v))
+			{
+				$ids[$v] = $v;
+			}
+		}
+    	return $ids;
+    }
 }

@@ -936,7 +936,8 @@ class cConverter
 							'files'			=> $q['files'],
 							'tags'			=> $q['tags'],
 							'md5s'			=> $q['md5s'],
-							'ovids'			=> $q['ovids']
+							'ovids'			=> $q['ovids'],
+							'group_id'		=> (empty($q['group_id'])) ? 0 : $q['group_id'],
 						);
 
 						$qInfo = array(
@@ -1315,7 +1316,7 @@ class cConverter
 		{
 			if ($cmdInfo['state'] && filesize($this->batName))
 			{
-				//НЕ ПЕРЕСОХДАЕМ КОМАНДНЫЙ ФАЙЛ, ЕСЛИ ОПЕРАЦИЯ СТАРТОВАЛА
+				//НЕ ПЕРЕСОЗДАЕМ КОМАНДНЫЙ ФАЙЛ, ЕСЛИ ОПЕРАЦИЯ СТАРТОВАЛА
 				$this->batName = '';
 				return false;
 			}

@@ -133,7 +133,7 @@ class partnerTransport implements iConverterTransport
 				$childs = $this->getChildsIds($parentExists['childs']);
 				$childs[$variantInfo['id']] = $variantInfo['id'];
 				$parentExists['childs'] = ',' . implode(',', $childs) . ',';
-				$sql = 'UPDATE dm_product_variants SET childs = "' . $childs . '" WHERE id = ' . $parentExists['id'];
+				$sql = 'UPDATE dm_product_variants SET childs = "' . $parentExists['childs'] . '" WHERE id = ' . $parentExists['id'];
 				mysql_query($sql, $db);
 			}
 			else
@@ -279,7 +279,7 @@ class partnerTransport implements iConverterTransport
 		$sql = '
 			SELECT pv.product_id, pv.online_only, p.title, pv.title as pvtitle, pv.description as pvdescription, pv.id FROM dm_product_variants AS pv
 				INNER JOIN dm_products as p ON (pv.product_id = p.id)
-				WHERE pv.cloud_ready = 0 ' . $condition . ' ORDER BY pv.id
+				WHERE pv.cloud_ready = 0 AND cloud_compressor IN (0, ' . _STATION_ . ') ' . $condition . ' ORDER BY pv.id
 		';
 		$q = mysql_query($sql, $db);
 		$variants = array();
@@ -384,6 +384,13 @@ class partnerTransport implements iConverterTransport
 				'ovids' => $ovids,
 				'tags' => $tags,
 			);
+		}
+
+		if (!empty($variants))
+		{
+			$vIds = implode(',', array_keys($variants));
+			$sql = 'UPDATE dm_product_variants SET cloud_compressor = ' . _STATION_ . ' WHERE id IN (' . $vIds . ')';
+			mysql_query($sql, $db);
 		}
 
 		mysql_close($db);

@@ -205,7 +205,10 @@ class partnerTransport implements iConverterTransport
 			';
 			mysql_query($sql, $db);
 		}
-//ВРОДЕ БЫ ГОТОВО К ОТЛАДКЕ НА КОМПРЕССОРЕ
+
+		//ПУБЛИКУЕМ ПРОДУКТ
+		$sql = 'UPDATE dm_products SET active=0 WHERE id = ' . $variantInfo['product_id'];
+		mysql_query($sql, $db);
 
 		mysql_close($db);
 	}

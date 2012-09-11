@@ -12,6 +12,34 @@ if (!defined("_PARTNER_"))
 class cConverter
 {
 	/**
+	 * имя лог-файла текушей сессии
+	 *
+	 * @var string
+	 */
+	public $logFileName;
+
+	/**
+	 * имя файла кода ошибки последней операции
+	 *
+	 * @var string
+	 */
+	public $crashFileName;
+
+	/**
+	 * Код ошибки при выполнении операции
+	 *
+	 * @var integer
+	 */
+	public $errorNo;
+
+	/**
+	 * Сообщение об ошибке
+	 *
+	 * @var string
+	 */
+	public $errorMsg;
+
+	/**
 	 * ВЫПОЛННИЕ КОМАНДЫ ОЧЕРЕДИ (magic)
 	 *
 	 * @param mixed $cmdInfo - структура данных команды
@@ -147,6 +175,7 @@ class cConverter
 							$checkConn = $this->transport->checkConnections();
 							if ($checkConn)
 							{
+								//ЕСТЬ ОШИБКИ
 								$this->threadCount++;
 								$this->log($checkConn);
 								break;
@@ -879,6 +908,7 @@ class cConverter
 		$this->db = $this->connectDb("mycloud", $this->db);
 		$sql = 'SELECT * FROM dm_income_queue WHERE partner_id = ' . _PARTNER_ID_ . ' AND cmd_id < ' . _CMD_DONE_ . ' AND state < ' . _STATE_ERR_ . ' AND station_id IN (0, ' . _STATION_ . ') ORDER BY priority DESC, cmd_id DESC, state DESC';
 		$q = mysql_query($sql, $this->db);
+		$cnt = mysql_num_rows($q);
 		while ($cmdInfo = mysql_fetch_assoc($q))
 		{
 			if (empty($cmdInfo['info']))
@@ -901,6 +931,15 @@ class cConverter
 */
 			}
 			$this->run($cmdInfo);
+
+			if (!empty($this->transport->errorNo))
+			{
+				//ОШИБКА ВЫПОЛНЕНИЯ. ВЫХОДИМ
+				$cnt = 0;
+				$this->treadCount = 0;
+				break;
+			}
+
 			if ($this->threadCount <= 0)
 			{
 				$this->log('сработало ограничение по количеству потоков max=' . _THREADS_CNT_);
@@ -910,7 +949,6 @@ class cConverter
 				break;//ВЫПОЛНЯЕМ ПО ОДНОМУ КОМАНДНОМУ ФАЙЛУ НА КАЖДЫЙ ЗАПУСК КОНВЕРТЕРА
 		}
 
-		$cnt = mysql_num_rows($q);
 		mysql_free_result($q);
 
 		if (empty($cnt) && !empty($this->threadCount))
@@ -1190,13 +1228,6 @@ class cConverter
 	protected $cmdContent;
 
 	/**
-	 * имя лог-файла текушей сессии
-	 *
-	 * @var string
-	 */
-	protected $logFileName = '';
-
-	/**
 	 * коннект к БД (handle)
 	 *
 	 * @var integer
@@ -1225,8 +1256,12 @@ class cConverter
 		$db = mysql_connect($this->dbs[$cfgName]['host'], $this->dbs[$cfgName]['user'], $this->dbs[$cfgName]['pwd'], true);
 		if (!$db)
 		{
-			$msg = iconv(_SOURCE_CHARSET_, _CONSOLE_CHARSET_, 'Ошибка соединения с БД (' . $cfgName . ')');
-			$this->log($msg . ' ' . mysql_errno());
+			$this->errorNo = _ERR_DB_;
+			$msg = 'Ошибка соединения с БД (' . $cfgName . ') ' . mysql_errno();
+			$this->errorMsg = $msg;
+			$msg = iconv(_SOURCE_CHARSET_, _CONSOLE_CHARSET_, $msg);
+			$this->log($msg);
+			$this->releaseLog();
 			die($msg);
 		}
 		mysql_select_db($this->dbs[$cfgName]['name'], $db);
@@ -1259,21 +1294,79 @@ class cConverter
 		$this->createTree(_POSTER_PATH_);
 
 		if (empty($this->logFileName))
+		{
 			$this->logFileName = 'current.' . _PARTNER_ . '.log';
+			$this->crashFileName = 'current.' . _PARTNER_ . '.crash';
+		}
 
 		$current = _LOG_PATH_ . _SL_ . $this->logFileName;
 		if (file_exists($current))
 		{
-			//ЖДЕМ НЕКОТОРЕ ВРЕМЯ, ПОТОМ ПЕРЕИМЕНОВЫВАЕМ ЗАВИСШИЙ ЛОГ
-			$curTime = time();
-			clearstatcache();
-			$fileTime = filemtime($current);
-			if ($fileTime && ($curTime - $fileTime > 3600 * 3))//ТРИ ЧАСА
+			//ЗНАЧИТ ПРОДОЛЖАЕТСЯ ВЫПОЛНЕНИЕ ИЛИ БЫЛО ФАТАЛЬНОЕ ПРЕКРАЩЕНИЕ РАБОТЫ
+			//ПРОВЕРЯЕМ КРАШКОД
+			if (file_exists(_LOG_PATH_ . _SL_ . $this->crashFileName))
+			{
+				$crashCode = file_get_contents(_LOG_PATH_ . _SL_ . $this->crashFileName);
+			}
+			if (!empty($crashCode))
 			{
 				$restartName = 'current.' . _PARTNER_ . '.restart.' . date('Y-m-d_H-i-s') . '.log';
-				rename($current, _LOG_PATH_ . _SL_ . $restartName);
-				die(iconv(_SOURCE_CHARSET_, _CONSOLE_CHARSET_, 'Перезапускаем после простоя. подробнее см. лог-файл ' . $restartName));
-				return;
+				//АНАЛИЗИРУЕМ КОД ИЛИ ЖДЕМ ОТСЕЧКУ ПО ВРЕМЕНИ
+				switch ($crashCode)
+				{
+					case _ERR_NO_FILESERVER_:
+						//ПРОВЕРЯЕМ СОЕДИНЕНИЕ С ФАЙЛОВЫМИ СЕРВЕРАМИ
+						if (!$this->checkFileConnections())
+						{
+							//ОШИБОК НЕТ
+							rename($current, _LOG_PATH_ . _SL_ . $restartName);
+							unlink(_LOG_PATH_ . _SL_ . $this->crashFileName);
+						}
+					break;
+
+					case _ERR_COPYFILE_:
+						//ПЕРЕХОДИМ К СЛЕДУЮЩЕЙ ОПЕРАЦИИ
+						rename($current, _LOG_PATH_ . _SL_ . $restartName);
+						unlink(_LOG_PATH_ . _SL_ . $this->crashFileName);
+					break;
+
+					case _ERR_DB_:
+						//ПРОВЕРЯЕМ СОЕДИНЕНИЕ С БД
+						if (!$this->checkDBConnections())
+						{
+							//ОШИБОК НЕТ
+							rename($current, _LOG_PATH_ . _SL_ . $restartName);
+							unlink(_LOG_PATH_ . _SL_ . $this->crashFileName);
+						}
+					break;
+
+					case _ERR_NO_WEBSERVER_:
+						//СКАЧКА ТЕСТОВОГО ФАЙЛА
+						/**
+						 * !!! К РЕАЛИЗАЦИИ !!!
+						 * //тестовый файл test.mp4 должен лежать в корне директории content конвертера
+						 * $cmd = "wget -O test.mp4.piece http://127.0.0.1:81/test.mp4?start=10"
+						 *
+						 * если тестовое скачивание прошло успешно, рестартуем конвертер
+						 *
+						 */
+						rename($current, _LOG_PATH_ . _SL_ . $restartName);
+						unlink(_LOG_PATH_ . _SL_ . $this->crashFileName);
+					break;
+
+					default:
+						//ЖДЕМ НЕКОТОРЕ ВРЕМЯ, ПОТОМ ПЕРЕИМЕНОВЫВАЕМ ЗАВИСШИЙ ЛОГ
+						$curTime = time();
+						clearstatcache();
+						$fileTime = filemtime($current);
+						if ($fileTime && ($curTime - $fileTime > 3600 * 3))//ТРИ ЧАСА
+						{
+							rename($current, _LOG_PATH_ . _SL_ . $restartName);
+							unlink(_LOG_PATH_ . _SL_ . $this->crashFileName);
+							die(iconv(_SOURCE_CHARSET_, _CONSOLE_CHARSET_, 'Перезапускаем после простоя. подробнее см. лог-файл ' . $restartName));
+							return;
+						}
+				}
 			}
 			else
 			{
@@ -1299,6 +1392,13 @@ class cConverter
 	public function releaseLog()
 	{
 		$current = _LOG_PATH_ . _SL_ . $this->logFileName;
+		if (!empty($this->errorNo))
+		{
+			$crash = _LOG_PATH_ . _SL_ . $this->crashFileName;
+			file_put_contents($crash, $this->errorNo);
+			return;
+		}
+
 		if (file_exists($current))
 		{
 			rename($current, _LOG_PATH_ . _SL_ . date('Y-m-d_H-i-s') . '.log');
@@ -1400,18 +1500,96 @@ class cConverter
 
 	public function __construct($dbs)
 	{
+		$this->errorMsg = '';
+		$this->errorNo = _ERR_OK_;
 		if (!setlocale(LC_ALL, 'ru_RU'))
 			setlocale(LC_ALL, 'rus');
 		$this->dbs = $dbs;
 		$this->initLog();
-		$this->transport = new partnerTransport($dbs);
-		$this->queue();
-		$this->exec();
+		$this->checkConnections();
+		if (empty($this->errorNo))
+		{
+			$this->transport = new partnerTransport($dbs);
+			$this->queue();
+			$this->exec();
+		}
+		else
+		{
+			$this->releaseLog();
+		}
 	}
 
 	public function __destruct()
 	{
 		$this->closeDb($this->db);
+	}
+
+	/**
+	 * метод проверки связи с файловыми серверами
+	 *
+	 */
+	public function checkFileConnections()
+	{
+//ПРОВЕРЯЕМ КОННЕКТЫ С ФАЙЛОВЫМИ СЕРВЕРАМИ
+		$this->errorNo = _ERR_OK_;
+		$this->errorMsg = '';
+		$paths = array(
+			_LOG_PATH_,
+			_COPY_PATH_,
+			_CONV_PATH_,
+			_READY_PATH_,
+			_CMD_PATH_,
+			_TMP_PATH_,
+			_POSTER_PATH_
+		);
+		foreach ($paths as $p)
+		{
+			if (!file_exists($p))
+			{
+				$this->errorNo = _ERR_NO_FILESERVER_;
+				$this->errorMsg = 'невозможно обратиться к файловому серверу (путь ' . $p . ')';
+				return $this->errorMsg;
+			}
+		}
+
+		return $this->errorMsg;
+	}
+
+	/**
+	 * метод проверки связи с серверами БД
+	 *
+	 */
+	public function checkDBConnections()
+	{
+		$this->errorNo = _ERR_OK_;
+		$this->errorMsg = '';
+//ПРОВЕРЯЕМ КОННЕКТЫ С БД
+		foreach ($this->dbs as $d)
+		{
+			$db = mysql_connect($d['host'], $d['user'], $d['pwd'], true);
+			if (!$db)
+			{
+				$this->errorNo = _ERR_DB_;
+				$this->errorMsg = 'ошибка соединения с БД ' . $d['host'] . '@' . $d['user'];
+				return $this->errorMsg;
+			}
+			mysql_select_db($d['name'], $db);
+			mysql_close($db);
+		}
+		return $this->errorMsg;
+	}
+
+	/**
+	 * метод проверки связи с серверами БД и файловыми серверами
+	 *
+	 */
+	public function checkConnections()
+	{
+		$err = $this->checkDBConnections();
+		if ($err) return $err;
+
+		$err = $this->checkFileConnections();
+		return $err;
 	}
 }
 

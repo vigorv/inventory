@@ -15,7 +15,18 @@ class partnerTransport implements iConverterTransport
 	 */
 	protected $dbs;
 
+	/**
+	 * Код ошибки при выполнении операции
+	 *
+	 * @var integer
+	 */
 	public $errorNo;
+
+	/**
+	 * Сообщение об ошибке
+	 *
+	 * @var string
+	 */
 	public $errorMsg;
 
 	public function copyFiles($files)
@@ -52,7 +63,6 @@ class partnerTransport implements iConverterTransport
 	public function copyOutCmd($oldName, $newName, $subDir)
 	{
 		$cmd = array();
-		$this->errorMsg = '';
 		$oldInfo = pathinfo($oldName);
 		$newDir = _SRC_PATH_ . $oldInfo['dirname'] . '/' . $subDir;
 //echo $newDir . "\n";
@@ -90,11 +100,11 @@ class partnerTransport implements iConverterTransport
 	 */
 	public function saveBack($originalId, $oldName, $newName, $preset, $fInfo)
 	{
-		$this->errorMsg = '';
 		$cfgName = 'mycloud';
 		$db = mysql_connect($this->dbs[$cfgName]['host'], $this->dbs[$cfgName]['user'], $this->dbs[$cfgName]['pwd'], true);
 		if (!$db)
 		{
+			$this->errorNo = _ERR_DB_;
 			$this->errorMsg = 'Невозможно соединиться с БД ' . $this->dbs[$cfgName]['host'] . '@' . $this->dbs[$cfgName]['user'];
 			return false;
 		}
@@ -135,6 +145,7 @@ class partnerTransport implements iConverterTransport
 		}
 		else
 		{
+			$this->errorNo = _ERR_ERROR_;
 			$this->errorMsg = 'Невозможно создать новый вариант файла';
 			mysql_close($db);
 			return false;
@@ -161,11 +172,11 @@ class partnerTransport implements iConverterTransport
 
 	public function dropOriginal($originalId)
 	{
-		$this->errorMsg = '';
 		$cfgName = 'mycloud';
 		$db = mysql_connect($this->dbs[$cfgName]['host'], $this->dbs[$cfgName]['user'], $this->dbs[$cfgName]['pwd'], true);
 		if (!$db)
 		{
+			$this->errorNo = _ERR_DB_;
 			$this->errorMsg = 'Невозможно соединиться с БД ' . $this->dbs[$cfgName]['host'] . '@' . $this->dbs[$cfgName]['user'];
 			return false;
 		}
@@ -240,10 +251,10 @@ class partnerTransport implements iConverterTransport
 			$condition = ' AND ' . $condition;
 		}
 		$cfgName = 'mycloud';
-		$this->errorMsg = '';
 		$db = mysql_connect($this->dbs[$cfgName]['host'], $this->dbs[$cfgName]['user'], $this->dbs[$cfgName]['pwd'], true);
 		if (!$db)
 		{
+			$this->errorNo = _ERR_DB_;
 			$this->errorMsg = 'Невозможно соединиться с БД ' . $this->dbs[$cfgName]['host'] . '@' . $this->dbs[$cfgName]['user'];
 			return false;
 		}
@@ -306,6 +317,8 @@ class partnerTransport implements iConverterTransport
 	public function __construct($dbs)
 	{
 		$this->dbs = $dbs;
+		$this->errorNo = _ERR_OK_;
+		$this->errorMsg = '';
 	}
 
 	/**
@@ -315,7 +328,8 @@ class partnerTransport implements iConverterTransport
 	public function checkConnections()
 	{
 //ПРОВЕРЯЕМ КОННЕКТЫ С ФАЙЛОВЫМИ СЕРВЕРАМИ
-		$errorMsg = '';
+		$this->errorNo = _ERR_OK_;
+		$this->errorMsg = '';
 		$paths = array(
 			_COPY_PATH_,
 			_SRC_PATH_
@@ -324,8 +338,9 @@ class partnerTransport implements iConverterTransport
 		{
 			if (!file_exists($p))
 			{
-				$errorMsg = 'невозможно обратиться к файловому серверу (путь ' . $p . ')';
-				return $errorMsg;
+				$this->errorNo = _ERR_NO_FILESERVER_;
+				$this->errorMsg = 'невозможно обратиться к файловому серверу (путь ' . $p . ')';
+				return $this->errorMsg;
 			}
 		}
 
@@ -335,13 +350,14 @@ class partnerTransport implements iConverterTransport
 			$db = mysql_connect($d['host'], $d['user'], $d['pwd'], true);
 			if (!$db)
 			{
-				$errorMsg = 'ошибка соединения с БД ' . $d['host'] . '@' . $d['user'];
-				return $errorMsg;
+				$this->errorNo = _ERR_DB_;
+				$this->errorMsg = 'ошибка соединения с БД ' . $d['host'] . '@' . $d['user'];
+				return $this->errorMsg;
 			}
 			mysql_select_db($d['name'], $db);
 			mysql_close($db);
 		}
-		return $errorMsg;
+		return $this->errorMsg;
 	}
 
 	/**
@@ -371,6 +387,7 @@ class partnerTransport implements iConverterTransport
 				}
 				if (!$result)
 				{
+					$this->errorNo = _ERR_NO_FILESERVER_;
 					$this->errorMsg = 'Невозможно создать директорию ' . $curDir;
 					break;
 				}

@@ -210,7 +210,7 @@ class partnerTransport implements iConverterTransport
 			);
 
 			$sql = 'INSERT INTO dm_product_files (id, `size`, md5, fname, preset_id, variant_quality_id)
-				VALUES (NULL, ' . $fileExists['size'] . ', ' . $fileExists['md5'] . ', "' . $fileExists['fname'] . '", ' .
+				VALUES (NULL, ' . $fileExists['size'] . ', "' . $fileExists['md5'] . '", "' . $fileExists['fname'] . '", ' .
 				$fileExists['preset_id'] . ', ' . $fileExists['variant_quality_id'] . ')
 			';
 			mysql_query($sql, $db);

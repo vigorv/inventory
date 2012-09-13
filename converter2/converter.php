@@ -182,7 +182,7 @@ class cConverter
 							}
 
 							//ПРОЦЕСС НАЧАЛСЯ. СТАВИМ ДАТУ НАЧАЛА
-							$sql = 'UPDATE dm_income_queue SET date_start = "' . date('Y-m-d H:i:s') . '"';
+							$sql = 'UPDATE dm_income_queue SET date_start = "' . date('Y-m-d H:i:s') . '" WHERE id = ' . $cmdInfo['id'];
 							mysql_query($sql, $this->db);
 
 							$cmdFiles = $this->transport->copyFiles($info['files']);

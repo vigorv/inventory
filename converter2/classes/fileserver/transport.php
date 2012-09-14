@@ -163,11 +163,26 @@ class partnerTransport implements iConverterTransport
 				'fname'		=> basename($newName),
 			);
 			$sql = 'INSERT INTO dm_filelocations (id, server_id, state, fsize, fname, folder)
-			VALUES (' . $fileInfo['id'] . ', ' . $fileInfo['server_id'] . ', ' . $fileInfo['state'] . ', '
+			VALUES (' . $fileInfo['id'] . ', ' . _FILESERVER_ID_ . ', ' . $fileInfo['state'] . ', '
 			. $fileInfo['fsize'] . ', "' . $fileInfo['fname'] . '", "' . $fileInfo['folder'] . '")';
 			mysql_query($sql, $db);
+			$locationId = mysql_insert_id($db);
+
+			//ДОБАВЛЯЕМ СВЯЗЬ ЛОКАЦИИ ФАЙЛА С СЕРВЕРОМ
+			$sql = 'INSERT INTO dm_filelocations_servers (location_id, server_id)
+			VALUES (' . $locationId . ', ' . _FILESERVER_ID_ . ')';
+			mysql_query($sql, $db);
 		}
+		else
+		{
+			$this->errorNo = _ERR_ERROR_;
+			$this->errorMsg = 'Невозможно выбрать оригинальный вариант файла';
+			mysql_close($db);
+			return false;
+		}
+
 		mysql_close($db);
+		return true;
 	}
 
 	public function dropOriginal($originalId)

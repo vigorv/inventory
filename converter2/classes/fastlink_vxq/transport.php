@@ -314,6 +314,34 @@ class partnerTransport implements iConverterTransport
 				continue;
 			}
 
+			if (strpos($r['file_name'], 'low/') !== false)//УЖЕ КОНВЕРТИРОВАЛИ
+			{
+				$sql = 'UPDATE fl_catalog SET cloud_compressor = ' . _STATION_ . ', cloud_ready = 1, cloud_state = 0 WHERE id = ' . $r['id'];
+				mysql_query($sql, $db);
+				continue;
+			}
+
+			if (strpos($r['file_name'], 'medium/') !== false)//УЖЕ КОНВЕРТИРОВАЛИ
+			{
+				$sql = 'UPDATE fl_catalog SET cloud_compressor = ' . _STATION_ . ', cloud_ready = 1, cloud_state = 0 WHERE id = ' . $r['id'];
+				mysql_query($sql, $db);
+				continue;
+			}
+
+			if (strpos($r['file_name'], 'high/') !== false)//УЖЕ КОНВЕРТИРОВАЛИ
+			{
+				$sql = 'UPDATE fl_catalog SET cloud_compressor = ' . _STATION_ . ', cloud_ready = 1, cloud_state = 0 WHERE id = ' . $r['id'];
+				mysql_query($sql, $db);
+				continue;
+			}
+
+			if (strpos($r['file_name'], 'ultra/') !== false)//УЖЕ КОНВЕРТИРОВАЛИ
+			{
+				$sql = 'UPDATE fl_catalog SET cloud_compressor = ' . _STATION_ . ', cloud_ready = 1, cloud_state = 0 WHERE id = ' . $r['id'];
+				mysql_query($sql, $db);
+				continue;
+			}
+
 			$sql = 'UPDATE fl_catalog SET cloud_compressor = ' . _STATION_ . ', cloud_state = ' . _CLOUD_STATE_BUSY_ . ' WHERE id = ' . $r['id'];
 			mysql_query($sql, $db);
 

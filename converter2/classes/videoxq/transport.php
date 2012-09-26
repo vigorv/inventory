@@ -380,6 +380,34 @@ class partnerTransport implements iConverterTransport
 				continue;
 			}
 
+			if (strpos($r['file_name'], 'low/') !== false)//УЖЕ КОНВЕРТИРОВАЛИ
+			{
+				$sql = 'UPDATE film_files SET cloud_compressor = ' . _STATION_ . ', cloud_ready = 1, cloud_state = 0 WHERE id = ' . $r['ffid'];
+				mysql_query($sql, $db);
+				continue;
+			}
+
+			if (strpos($r['file_name'], 'medium/') !== false)//УЖЕ КОНВЕРТИРОВАЛИ
+			{
+				$sql = 'UPDATE film_files SET cloud_compressor = ' . _STATION_ . ', cloud_ready = 1, cloud_state = 0 WHERE id = ' . $r['ffid'];
+				mysql_query($sql, $db);
+				continue;
+			}
+
+			if (strpos($r['file_name'], 'high/') !== false)//УЖЕ КОНВЕРТИРОВАЛИ
+			{
+				$sql = 'UPDATE film_files SET cloud_compressor = ' . _STATION_ . ', cloud_ready = 1, cloud_state = 0 WHERE id = ' . $r['ffid'];
+				mysql_query($sql, $db);
+				continue;
+			}
+
+			if (strpos($r['file_name'], 'ultra/') !== false)//УЖЕ КОНВЕРТИРОВАЛИ
+			{
+				$sql = 'UPDATE film_files SET cloud_compressor = ' . _STATION_ . ', cloud_ready = 1, cloud_state = 0 WHERE id = ' . $r['ffid'];
+				mysql_query($sql, $db);
+				continue;
+			}
+
 			if (empty($queue[$r['id']]))
 			{
 				$files = array();

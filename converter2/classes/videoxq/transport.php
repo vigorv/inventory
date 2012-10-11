@@ -271,9 +271,53 @@ class partnerTransport implements iConverterTransport
 		}
 
 		$filesIds2Delete = array();
-		$filesNames2Delete = array();//ДЛЯ МЕДИА КАТАЛОГА
-		if ($oldFileInfo)
-		{
+//		if ($oldFileInfo)
+//		{
+			//ВЫБИРАЕМ ВСЕ ФАЙЛЫ ЭТОГО ФИЛЬМА СО СВЯЗЯМИ
+			$sql = 'SELECT ff.id, fv.id AS fvid FROM films AS f
+				INNER JOIN film_variants AS fv ON (fv.film_id = f.id)
+				INNER JOIN film_files as ff ON (ff.film_variant_id = fv.id)
+				WHERE f.id = ' . $originalId . ' AND ff.cloud_state = ' . _CLOUD_STATE_SPIRIT_;
+			$q = mysql_query($sql, $db);
+//НУЖНО ВЫЯСНИТЬ КАКИЕ ВАРИАНТЫ МОЖНО УДАЛИТЬ (ФАЙЛЫ КОТОРЫХ ОТМЕЧЕНЫ НА УДАЛЕНИЕ ИЛИ ВООБЩЕ НЕ ИМЕЮТ ФАЙЛОВ)
+			while ($r = mysql_fetch_assoc($q))
+			{
+				$filesIds2Delete[] = $r['id'];
+			}
+			mysql_free_result($q);
+
+			if (!empty($filesIds2Delete))
+			{
+				//УДАЛЯЕМ ФАЙЛЫ
+				$sql = 'DELETE FROM film_files WHERE id IN (' . implode(',', $filesIds2Delete) . ')';
+				$q = mysql_query($sql, $db);
+			}
+
+			//УДАЛЯЕМ ВАРИАНТЫ БЕЗ ФАЙЛОВ
+			$sql = '
+				SELECT fv.id AS fvid FROM films AS f
+					INNER JOIN film_variants AS fv ON ( fv.film_id = f.id )
+					LEFT JOIN film_files AS ff ON ( ff.film_variant_id = fv.id )
+				WHERE f.is_license=1 AND ISNULL( ff.id )
+			';
+			while ($r = mysql_fetch_assoc($q))
+			{
+				$variantsIds2Delete[] = $r['fvid'];
+			}
+			mysql_free_result($q);
+
+			if (!empty($variantsIds2Delete))
+			{
+				//УДАЛЯЕМ ВАРИАНТЫ И ТРЭКИ
+				$sql = 'DELETE FROM film_variants WHERE id IN (' . implode(',', $variantsIds2Delete) . ')';
+				$q = mysql_query($sql, $db);
+				$sql = 'DELETE FROM tracks WHERE film_variant_id IN (' . implode(',', $variantsIds2Delete) . ')';
+				$q = mysql_query($sql, $db);
+			}
+
+			//
+
+			/*
 			//ТЕПЕРЬ ВЫБИРАЕМ СТАРЫЕ ЗАПИСИ О ФАЙЛАХ (СТАРОГО ВАРИАНТА), КОТОРЫЕ МОЖНО УДАЛИТЬ
 			$sql = 'SELECT ff.id, ff.file_name, ff.cloud_state FROM films AS f
 				INNER JOIN film_variants AS fv ON (fv.film_id = f.id)
@@ -301,7 +345,8 @@ class partnerTransport implements iConverterTransport
 				$sql = 'DELETE FROM tracks WHERE film_variant_id = ' . $oldFileInfo['film_variant_id'];
 				$q = mysql_query($sql, $db);
 			}
-		}
+			*/
+//		}
 		mysql_close($db);
 	}
 

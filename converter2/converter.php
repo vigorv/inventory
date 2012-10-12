@@ -707,7 +707,7 @@ class cConverter
 					//ДОБАВЛЕНИЕ В ВИТРИНЫ И В ПП ПОЛЬЗОВАТЕЛЕЙ, ОЖИДАЮЩИХ ОЧЕРЕДИ НА ЭТОТ ПРОДУКТ
 					if ($cmdInfo['user_id'] > 0)
 					{
-						$cmd = 'wget ' . _MYCLOUD_SITE_ . '/products/addfromqueue/' . $cmdInfo['id'];
+						$cmd = 'wget -O ' . _TMP_PATH_ . '/wget.tmp ' . _MYCLOUD_SITE_ . '/products/addfromqueue/' . $cmdInfo['id'];
 						exec($cmd);
 					}
 
@@ -719,7 +719,7 @@ class cConverter
 				case _CMD_UNIVERSE_:
 					//ОТДЕЛЬНОЕ ДЕЙСТВИЕ НА ДОБАЛЕНИЕ В ПП (ПОСЛЕ ПРОВЕРКИ, ЧТО ПРОДУКТ УЖЕ В ВИТРИНЕ)
 					//ДОБАВЛЕНИЕ В ВИТРИНЫ И В ПП ПОЛЬЗОВАТЕЛЕЙ, ОЖИДАЮЩИХ ОЧЕРЕДИ НА ЭТОТ ПРОДУКТ
-					$cmd = 'wget ' . _MYCLOUD_SITE_ . '/products/addfromqueue/' . $cmdInfo['id'];
+					$cmd = 'wget -O ' . _TMP_PATH_ . '/wget.tmp ' . _MYCLOUD_SITE_ . '/products/addfromqueue/' . $cmdInfo['id'];
 					exec($cmd);
 					$this->setQueueState($cmdInfo, _STATE_WAIT_);
 					$this->setQueueCmd($cmdInfo, _CMD_DONE_);

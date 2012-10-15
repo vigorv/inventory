@@ -78,13 +78,14 @@ class partnerTransport implements iConverterTransport
 		$newDir = _SRC_PATH_ . $oldInfo['dirname'] . '/' . $subDir;
 //echo $newDir . "\n";
 //КОПИРУЕМ НА БЛЭЙЗ
-		if ($this->createTree(_SRC_PATH_, $newDir))
-			$cmd[] = "rsync -r --delete-after --size-only " . $newName . " " . $newDir . '/' . basename($newName);
+//		if ($this->createTree(_SRC_PATH_, $newDir))
+//			$cmd[] = "rsync -r --delete-after --size-only " . $newName . " " . $newDir . '/' . basename($newName);
+
 		$newDir = _SRC2_PATH_ . $oldInfo['dirname'] . '/' . $subDir;
 //echo $newDir . "\n";
 //КОПИРУЕМ НА ТАЙФУН
 		if ($this->createTree(_SRC2_PATH_, $newDir))
-			$cmd[] = "rsync -r --delete-after --size-only " . $newName . " " . $newDir . '/' . basename($newName);
+			$cmd[] = "rsync -r --delete-after  --remove-source-files --size-only " . $newName . " " . $newDir . '/' . basename($newName);
 		return $cmd;
 	}
 

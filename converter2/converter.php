@@ -667,6 +667,7 @@ class cConverter
 										$this->threadCount++;
 										return;
 									}
+									unlink($fullName);
 								}
 								$this->transport->dropOriginal($cmdInfo['original_id']);
 							}

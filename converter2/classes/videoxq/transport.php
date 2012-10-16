@@ -85,7 +85,7 @@ class partnerTransport implements iConverterTransport
 //echo $newDir . "\n";
 //КОПИРУЕМ НА ТАЙФУН
 		if ($this->createTree(_SRC2_PATH_, $newDir))
-			$cmd[] = "rsync -r --delete-after  --remove-source-files --size-only " . $newName . " " . $newDir . '/' . basename($newName);
+			$cmd[] = "rsync -r --delete-after --size-only " . $newName . " " . $newDir . '/' . basename($newName);
 		return $cmd;
 	}
 

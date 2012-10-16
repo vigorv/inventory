@@ -79,7 +79,7 @@ class partnerTransport implements iConverterTransport
 //echo $newDir . "\n";
 //КОПИРУЕМ НА ШАРУ В СТРУКТУРЕ КАК НА БЛЕЗЕ (НА БЛЕЙЗ СИНХРОНИЗАЦИЯ ПРОИСХОДИТ ОТДЕЛЬНО)
 		if ($this->createTree(_OUT_PATH_, $newDir))
-			$cmd[] = "rsync -r --delete-after --remove-source-files --size-only " . $newName . " " . $newDir . '/' . basename($newName);
+			$cmd[] = "rsync -r --delete-after --size-only " . $newName . " " . $newDir . '/' . basename($newName);
 		return $cmd;
 	}
 

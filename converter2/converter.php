@@ -703,6 +703,11 @@ class cConverter
 						$readyName = _READY_PATH_ . $oInfo['dirname'] . _SL_ . $oInfo['basename'];
 						$this->createTree(_READY_PATH_ . $oInfo['dirname']);
 						rename($fullName, $readyName);
+
+						if (method_exists($this->transport, 'unlinkOriginalFile'))
+						{
+							$this->transport->unlinkOriginalFile($info["files"][$i]);
+						}
 					}
 
 					//ДОБАВЛЕНИЕ В ВИТРИНЫ И В ПП ПОЛЬЗОВАТЕЛЕЙ, ОЖИДАЮЩИХ ОЧЕРЕДИ НА ЭТОТ ПРОДУКТ

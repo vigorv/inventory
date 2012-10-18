@@ -47,6 +47,12 @@ class partnerTransport implements iConverterTransport
 		return $cmds;
 	}
 
+	public function unlinkOriginalFile($oldFile)
+	{
+		if (file_exists(_SRC_PATH_ . $oldFile))
+			unlink(_SRC_PATH_ . $oldFile);
+	}
+
 	/**
 	 * сгенерировать команду копирования сконвертированного файла
 	 * в хранилище партнера

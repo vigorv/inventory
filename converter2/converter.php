@@ -1423,6 +1423,7 @@ class cConverter
 			if ($cmdInfo['state'] && filesize($this->batName))
 			{
 				//НЕ ПЕРЕСОЗДАЕМ КОМАНДНЫЙ ФАЙЛ, ЕСЛИ ОПЕРАЦИЯ СТАРТОВАЛА
+				$this->log('операция в процессе. очередь ' . $cmdInfo['id'] . ' команда ' . $cmdInfo['cmd_id']);
 				$this->batName = '';
 				return false;
 			}
